@@ -25666,34 +25666,31 @@ class CodeParser {
      * @param code The code to parse. This is expected to be the entire code of a file.
      */
     readDirectory(directory, level) {
-        const indent = this.indentString.repeat(level ?? 0);
-        const directoryPrefix = `${indent}- `;
-        fs.readdir(directory, (derr, files) => {
-            if (derr) {
-                core.error(`Error reading directory ${directory}:`);
-                return;
-            }
-            const fileIndent = this.indentString.repeat((level ?? 0) + 1);
-            const filePrefix = `${fileIndent}- `;
-            for (const file of files) {
+        try {
+            const indent = this.indentString.repeat(level ?? 0);
+            const prefix = `${indent}- `;
+            const directoryContents = fs.readdirSync(directory);
+            const files = [];
+            for (const file of directoryContents) {
                 const filePath = path.join(directory, file);
-                fs.stat(filePath, (ferr, stats) => {
-                    if (ferr) {
-                        core.error(`Error getting stats of file ${filePath}:`);
-                        return;
-                    }
-                    if (stats.isDirectory()) {
-                        core.debug(`${directoryPrefix}Directory: ${file}`);
-                        // Recursively read the directory
-                        this.readDirectory(filePath, (level ?? 0) + 1);
-                    }
-                    else if (stats.isFile()) {
-                        // Process the file
-                        core.debug(`${filePrefix}File: ${file}`);
-                    }
-                });
+                const stats = fs.statSync(filePath);
+                if (stats.isDirectory()) {
+                    core.info(`${prefix}${file}`);
+                    // Recursively read the directory
+                    this.readDirectory(filePath, (level ?? 0) + 1);
+                }
+                else if (stats.isFile()) {
+                    files.push(file);
+                }
             }
-        });
+            for (const file of files) {
+                // Process the file
+                core.info(`${prefix}${file}`);
+            }
+        }
+        catch (err) {
+            console.error(`Error reading directory ${directory}:`, err);
+        }
     }
 }
 exports.CodeParser = CodeParser;
