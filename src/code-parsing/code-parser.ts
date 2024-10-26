@@ -1,4 +1,4 @@
-import { Import, Type, ParsedCodeFile } from '../../common/model/code-representation';
+import { Import, Type, ParsedCodeFile } from '../common/model/code-representation';
 
 /**
  * This is the interface that all language handlers must implement. It defines the methods that the code parser will
