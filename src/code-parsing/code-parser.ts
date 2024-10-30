@@ -24,38 +24,44 @@ export interface LanguageHandler {
   parseTypes(code: string): Type[];
 }
 
-export class CodeParser {
-  readonly indentString = '  ';
-
+/**
+ * Class that walks through a directory and parses all the code files in it.
+ */
+export class CodeBaseParser {
   /**
    * Parses the provided code.
    * @param code The code to parse. This is expected to be the entire code of a file.
    */
   readDirectory(directory: string, level?: number): void {
-    try {
-      const indent = this.indentString.repeat(level ?? 0);
-      const prefix = `${indent}- `;
-      const directoryContents = fs.readdirSync(directory);
-      const files: string[] = [];
+    const directoryContents = fs.readdirSync(directory);
 
-      for (const file of directoryContents) {
-        const filePath = path.join(directory, file);
-        const stats = fs.statSync(filePath);
+    for (const file of directoryContents) {
+      const filePath = path.join(directory, file);
+      const stats = fs.statSync(filePath);
 
-        if (stats.isDirectory()) {
-          core.info(`${prefix}${file}`);
-          // Recursively read the directory
-          this.readDirectory(filePath, (level ?? 0) + 1);
-        } else if (stats.isFile()) {
-          files.push(file);
-        }
+      if (stats.isDirectory()) {
+        core.debug(`Directory: ${filePath}`);
+        // Recursively read the directory
+        this.readDirectory(filePath, (level ?? 0) + 1);
+      } else if (stats.isFile()) {
+        core.info(`File: ${file}`);
+        const fileParser = new CodeFileParser();
+        fileParser.parse(filePath);
       }
-      for (const file of files) {
-        // Process the file
-        core.info(`${prefix}${file}`);
-      }
-    } catch (err) {
-      console.error(`Error reading directory ${directory}:`, err);
     }
+  }
+}
+
+/**
+ * Class that parses a code file.
+ */
+export class CodeFileParser {
+  /**
+   * Parses the provided code file.
+   *
+   * @param codeFilePath The path of the code file to parse.
+   */
+  parse(codeFilePath: string): void {
+    core.info(`Parsing code file ${codeFilePath}`);
   }
 }

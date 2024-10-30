@@ -25655,45 +25655,51 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CodeParser = void 0;
+exports.CodeFileParser = exports.CodeBaseParser = void 0;
 const core = __importStar(__nccwpck_require__(7484));
 const fs = __importStar(__nccwpck_require__(9896));
 const path = __importStar(__nccwpck_require__(6928));
-class CodeParser {
-    indentString = '  ';
+/**
+ * Class that walks through a directory and parses all the code files in it.
+ */
+class CodeBaseParser {
     /**
      * Parses the provided code.
      * @param code The code to parse. This is expected to be the entire code of a file.
      */
     readDirectory(directory, level) {
-        try {
-            const indent = this.indentString.repeat(level ?? 0);
-            const prefix = `${indent}- `;
-            const directoryContents = fs.readdirSync(directory);
-            const files = [];
-            for (const file of directoryContents) {
-                const filePath = path.join(directory, file);
-                const stats = fs.statSync(filePath);
-                if (stats.isDirectory()) {
-                    core.info(`${prefix}${file}`);
-                    // Recursively read the directory
-                    this.readDirectory(filePath, (level ?? 0) + 1);
-                }
-                else if (stats.isFile()) {
-                    files.push(file);
-                }
+        const directoryContents = fs.readdirSync(directory);
+        for (const file of directoryContents) {
+            const filePath = path.join(directory, file);
+            const stats = fs.statSync(filePath);
+            if (stats.isDirectory()) {
+                core.debug(`Directory: ${filePath}`);
+                // Recursively read the directory
+                this.readDirectory(filePath, (level ?? 0) + 1);
             }
-            for (const file of files) {
-                // Process the file
-                core.info(`${prefix}${file}`);
+            else if (stats.isFile()) {
+                core.info(`File: ${file}`);
+                const fileParser = new CodeFileParser();
+                fileParser.parse(filePath);
             }
-        }
-        catch (err) {
-            console.error(`Error reading directory ${directory}:`, err);
         }
     }
 }
-exports.CodeParser = CodeParser;
+exports.CodeBaseParser = CodeBaseParser;
+/**
+ * Class that parses a code file.
+ */
+class CodeFileParser {
+    /**
+     * Parses the provided code file.
+     *
+     * @param codeFilePath The path of the code file to parse.
+     */
+    parse(codeFilePath) {
+        core.info(`Parsing code file ${codeFilePath}`);
+    }
+}
+exports.CodeFileParser = CodeFileParser;
 
 
 /***/ }),
@@ -25740,7 +25746,7 @@ async function run() {
         // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
         core.debug(`Looking for source files in: ${sourceDirectory}`);
         // Parse the code in the source directory
-        const codeParser = new code_parser_1.CodeParser();
+        const codeParser = new code_parser_1.CodeBaseParser();
         codeParser.readDirectory(sourceDirectory);
         // Set outputs for other workflow steps to use
         core.setOutput('time', new Date().toTimeString());

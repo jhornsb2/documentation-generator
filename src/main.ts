@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { CodeParser } from './code-parsing/code-parser';
+import { CodeBaseParser } from './code-parsing/code-parser';
 
 /**
  * The main function for the action.
@@ -13,7 +13,7 @@ export async function run(): Promise<void> {
     core.debug(`Looking for source files in: ${sourceDirectory}`);
 
     // Parse the code in the source directory
-    const codeParser = new CodeParser();
+    const codeParser = new CodeBaseParser();
     codeParser.readDirectory(sourceDirectory);
 
     // Set outputs for other workflow steps to use
