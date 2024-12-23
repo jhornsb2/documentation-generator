@@ -2,6 +2,8 @@ import * as core from '@actions/core';
 import * as fs from 'fs';
 import * as path from 'path';
 
+const Parser = require('jison').Parser;
+
 import { Import, Type } from '../common/model/code-representation';
 
 /**
@@ -45,23 +47,110 @@ export class CodeBaseParser {
         this.readDirectory(filePath, (level ?? 0) + 1);
       } else if (stats.isFile()) {
         core.info(`File: ${file}`);
-        const fileParser = new CodeFileParser();
-        fileParser.parse(filePath);
-      }
-    }
-  }
-}
+        core.info(`Parsing code file ${filePath}`);
+        const fileContents = fs.readFileSync(filePath, 'utf-8');
+        const grammar = {
+          lex: {
+            rules: [
+              ['\\s+', 'console.log("Whitespace")'],
+              ['[a-f0-9]+', "return 'HEX';"],
+            ],
+          },
+
+          bnf: {
+            hex_strings: ['hex_strings HEX', 'HEX'],
+          },
+        };
+
+        // `grammar` can also be a string that uses jison's grammar format
+        const parser = new Parser(grammar);
+
+        // generate source, ready to be written to disk
+        core.info(parser.generate());
+
+        // you can also use the parser directly from memory
+
+        // TODO: parser.parse(fileContents);
+
+        // returns true
+        core.info(
+          parser.parse(
+            `package com.documentation.generator.java.classes;
 
 /**
- * Class that parses a code file.
+ * A simple class to test the documentation generator.
  */
-export class CodeFileParser {
-  /**
-   * Parses the provided code file.
-   *
-   * @param codeFilePath The path of the code file to parse.
-   */
-  parse(codeFilePath: string): void {
-    core.info(`Parsing code file ${codeFilePath}`);
+public class TestClass1 {
+
+	/**
+	 * A private field of type String.
+	 */
+	private String foo;
+
+	/**
+	 * A private field of type int.
+	 */
+	private int bar;
+
+	/**
+	 * Default constructor.
+	 */
+	public TestClass1() {
+		this("", 0);
+	}
+
+	/**
+	 * Constructor with all parameters.
+	 * 
+	 * @param foo The foo parameter.
+	 * @param bar The bar parameter.
+	 */
+	public TestClass1(String foo, int bar) {
+		this.foo = foo;
+		this.bar = bar;
+	}
+
+	/**
+	 * Getter for the foo field.
+	 * 
+	 * @return The foo field.
+	 */
+	public String getFoo() {
+		return foo;
+	}
+
+	/**
+	 * Setter for the foo field.
+	 * 
+	 * @param foo The new value for the foo field.
+	 */
+	public void setFoo(String foo) {
+		this.foo = foo;
+	}
+
+	/**
+	 * Getter for the bar field.
+	 * 
+	 * @return The bar field.
+	 */
+	public int getBar() {
+		return bar;
+	}
+
+	/**
+	 * Setter for the bar field.
+	 * 
+	 * @param bar The new value for the bar field.
+	 */
+	public void setBar(int bar) {
+		this.bar = bar;
+	}
+
+}
+`,
+          ),
+        );
+      }
+    }
   }
 }

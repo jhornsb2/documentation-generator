@@ -31,11 +31,13 @@
     "format:check": "npx prettier --check .",
     "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
     "lint:fix": "npx eslint . -c ./.github/linters/.eslintrc.yml",
+    "parsers:java": "npx jison src/code-parsing/parsers/generators/java/java.jison src/code-parsing/parsers/generators/java/java.jisonlex -o src/code-parsing/parsers/java-parser.js",
+    "parsers:all": "npm run parsers:java",
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "npx jest",
     "test:debug": "npx jest --verbose --runInBand --detectOpenHandles",
-    "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
+    "all": "npm run parsers:all && npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
   },
   "license": "MIT",
   "jest": {
@@ -88,6 +90,7 @@
     "prettier": "^3.3.3",
     "prettier-eslint": "^16.3.0",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "jison": "^0.4.18"
   }
 }
