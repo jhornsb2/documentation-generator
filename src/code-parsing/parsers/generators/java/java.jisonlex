@@ -19,76 +19,79 @@ whitespace                  \s+
 {digit}+(\.{digit}+)?([eE][+-]?{digit}+)?[dD]?  return 'DOUBLE_LITERAL';
 \"([^\"\\]|\\.)*\"                              return 'STRING_LITERAL';
 "null"                                          return 'NULL';
+"true"                                          return 'TRUE';
+"false"                                         return 'FALSE';
 
-// primitive types
+// reserved keywords
+"abstract"                                      return 'ABSTRACT';
+"assert"                                        return 'ASSERT';
 "boolean"                                       return 'BOOLEAN';
+"break"                                         return 'BREAK';
 "byte"                                          return 'BYTE';
+"case"                                          return 'CASE';
+"catch"                                         return 'CATCH';
 "char"                                          return 'CHAR';
-"double"                                        return 'DOUBLE';
-"float"                                         return 'FLOAT';
-"int"                                           return 'INT';
-"long"                                          return 'LONG';
-"short"                                         return 'SHORT';
-"void"                                          return 'VOID';
-
-// type declaration keywords
 "class"                                         return 'CLASS';
+"const"                                         return 'CONST';
+"continue"                                      return 'CONTINUE';
+"default"                                       return 'DEFAULT';
+"do"                                            return 'DO';
+"double"                                        return 'DOUBLE';
+"else"                                          return 'ELSE';
 "enum"                                          return 'ENUM';
-"interface"                                     return 'INTERFACE';
-
-// type inheritance keywords
 "extends"                                       return 'EXTENDS';
+"final"                                         return 'FINAL';
+"finally"                                       return 'FINALLY';
+"float"                                         return 'FLOAT';
+"for"                                           return 'FOR';
+"goto"                                          return 'GOTO';
+"if"                                            return 'IF';
 "implements"                                    return 'IMPLEMENTS';
-
-// access modifiers
+"import"                                        return 'IMPORT';
+"instanceof"                                    return 'INSTANCEOF';
+"int"                                           return 'INT';
+"interface"                                     return 'INTERFACE';
+"long"                                          return 'LONG';
+"native"                                        return 'NATIVE';
+"new"                                           return 'NEW';
 "package"                                       return 'PACKAGE';
 "private"                                       return 'PRIVATE';
 "protected"                                     return 'PROTECTED';
 "public"                                        return 'PUBLIC';
-
-// control flow keywords
-"break"                                         return 'BREAK';
-"case"                                          return 'CASE';
-"continue"                                      return 'CONTINUE';
-"else"                                          return 'ELSE';
-"goto"                                          return 'GOTO';
-"if"                                            return 'IF';
-"switch"                                        return 'SWITCH';
-
-// error handling keywords
-"assert"                                        return 'ASSERT';
-"catch"                                         return 'CATCH';
-"finally"                                       return 'FINALLY';
-"try"                                           return 'TRY';
-"throw"                                         return 'THROW';
-
-// loop keywords
-"do"                                            return 'DO';
-"for"                                           return 'FOR';
-"while"                                         return 'WHILE';
-
-// modifier keywords
-"abstract"                                      return 'ABSTRACT';
-"const"                                         return 'CONST';
-"final"                                         return 'FINAL';
-"native"                                        return 'NATIVE';
+"return"                                        return 'RETURN';
+"short"                                         return 'SHORT';
 "static"                                        return 'STATIC';
 "strictfp"                                      return 'STRICTFP';
+"super"                                         return 'SUPER';
+"switch"                                        return 'SWITCH';
+"synchronized"                                  return 'SYNCHRONIZED';
+"this"                                          return 'THIS';
+"throw"                                         return 'THROW';
 "throws"                                        return 'THROWS';
 "transient"                                     return 'TRANSIENT';
-
-// reference keywords
-"super"                                         return 'SUPER';
-"this"                                          return 'THIS';
-
-// miscellaneous keywords
-"default"                                       return 'DEFAULT';
-"import"                                        return 'IMPORT';
-"instanceof"                                    return 'INSTANCEOF';
-"new"                                           return 'NEW';
-"return"                                        return 'RETURN';
-"synchronized"                                  return 'SYNCHRONIZED';
+"try"                                           return 'TRY';
+"void"                                          return 'VOID';
 "volatile"                                      return 'VOLATILE';
+"while"                                         return 'WHILE';
+
+// contextual keywords
+"exports"                                       return 'EXPORTS';
+"module"                                        return 'MODULE';
+"non-sealed"                                    return 'NON_SEALED';
+"open"                                          return 'OPEN';
+"opens"                                         return 'OPENS';
+"permits"                                       return 'PERMITS';
+"provides"                                      return 'PROVIDES';
+"record"                                        return 'RECORD';
+"requires"                                      return 'REQUIRES';
+"sealed"                                        return 'SEALED';
+"to"                                            return 'TO';
+"transitive"                                    return 'TRANSITIVE';
+"uses"                                          return 'USES';
+"var"                                           return 'VAR';
+"when"                                          return 'WHEN';
+"with"                                          return 'WITH';
+"yield"                                         return 'YIELD';
 
 // identifiers can be a type or a variable name
 {id}                                            return 'IDENTIFIER';
@@ -105,8 +108,21 @@ whitespace                  \s+
 "=="                                            return 'EQUALS';
 "!="                                            return 'NOT_EQUALS';
 "="                                             return 'ASSIGN';
+"*="                                            return 'TIMES_ASSIGN';
+"/="                                            return 'DIVIDE_ASSIGN';
+"%="                                            return 'MOD_ASSIGN';
+"+="                                            return 'PLUS_ASSIGN';
+"-="                                            return 'MINUS_ASSIGN';
+"<<="                                           return 'LEFT_SHIFT_ASSIGN';
+">>="                                           return 'RIGHT_SHIFT_ASSIGN';
+">>>="                                          return 'UNSIGNED_RIGHT_SHIFT_ASSIGN';
+"&="                                            return 'BITWISE_AND_ASSIGN';
+"^="                                            return 'BITWISE_XOR_ASSIGN';
+"|="                                            return 'BITWISE_OR_ASSIGN';
 "+"                                             return 'PLUS';
+"++"                                            return 'PLUS_PLUS';
 "-"                                             return 'MINUS';
+"--"                                            return 'MINUS_MINUS';
 "*"                                             return 'TIMES';
 "/"                                             return 'DIVIDE';
 "%"                                             return 'MOD';
@@ -127,5 +143,13 @@ whitespace                  \s+
 "<<"                                            return 'LEFT_SHIFT';
 ">>"                                            return 'RIGHT_SHIFT';
 ">>>"                                           return 'UNSIGNED_RIGHT_SHIFT';
+":"                                             return 'COLON';
+"::"                                            return 'DOUBLE_COLON';
+"->"                                            return 'ARROW';
+
+"?"                                             return 'QUESTION_MARK';
+"@"                                             return 'AT';
+"\"                                             return 'BACKSLASH';
+"u"                                             return 'UNICODE_MARKER';
 
 <<EOF>>                                         return 'ENDOFFILE';
