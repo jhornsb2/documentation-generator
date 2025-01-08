@@ -7,15 +7,24 @@
 // ============================================================================
 // Compilation Units
 // ============================================================================
+/**
+ * Represents a Java compilation unit. Usually a .java file.
+ */
 CompilationUnit
     : OrdinaryCompilationUnit
     | ModularCompilationUnit
     ;
 
+/**
+ * The standard Java file structure.
+ */
 OrdinaryCompilationUnit
     : OptionalPackageDeclaration OptionalImportDeclarations TopLevelClassOrInterfaceDeclarations
     ;
 
+/**
+ * The Java file structure for modules.
+ */
 ModularCompilationUnit
     : OptionalImportDeclarations ModuleDeclaration
     ;
@@ -125,8 +134,7 @@ StaticImportOnDemandDeclaration
     : IMPORT STATIC TypeName DOT Splat SEMICOLON
     ;
 
-// Helper rule for on demand imports.
-Splat
+Splat // Helper rule for on demand imports. The * is used for this AND for multiplication, so we need to differentiate.
     : TIMES
     ;
 
