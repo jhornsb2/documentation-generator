@@ -5,6 +5,145 @@
 %%
 
 // ============================================================================
+// Compilation Units
+// ============================================================================
+CompilationUnit
+    : OrdinaryCompilationUnit
+    | ModularCompilationUnit
+    ;
+
+OrdinaryCompilationUnit
+    : OptionalPackageDeclaration OptionalImportDeclarations TopLevelClassOrInterfaceDeclarations
+    ;
+
+ModularCompilationUnit
+    : OptionalImportDeclarations ModuleDeclaration
+    ;
+
+// ============================================================================
+// Module Declarations
+// ============================================================================
+ModuleDeclaration
+    : Annotations OptionalOpen MODULE ModuleDeclarationModuleName LBRACE ModuleDirectiveList RBRACE
+    ;
+
+OptionalOpen
+    : /* empty */
+    | OPEN
+    ;
+
+ModuleDeclarationModuleName
+    : Identifier
+    | PackageDeclarationPackageName DOT Identifier
+    ;
+
+ModuleDirectiveList
+    : /* empty */
+    | ModuleDirective ModuleDirectiveList
+    ;
+
+ModuleDirective
+    : ModuleRequiresDirective
+    | ModuleExportsDirective
+    | ModuleOpensDirective
+    | ModuleUsesDirective
+    | ModuleProvidesDirective
+    ;
+
+ModuleRequiresDirective
+    : REQUIRES RequiresModifiers ModuleName SEMICOLON
+    ;
+
+ModuleExportsDirective
+    : EXPORTS PackageName SEMICOLON
+    | EXPORTS PackageName TO ModuleNameList SEMICOLON
+    ;
+
+ModuleOpensDirective
+    : OPENS PackageName SEMICOLON
+    | OPENS PackageName TO ModuleNameList SEMICOLON
+    ;
+
+ModuleUsesDirective
+    : USES TypeName SEMICOLON
+    ;
+
+ModuleProvidesDirective
+    : PROVIDES TypeName WITH TypeNameList SEMICOLON
+    ;
+
+// ============================================================================
+// Package Declarations
+// ============================================================================
+OptionalPackageDeclaration
+    : /* empty */
+    | PackageDeclaration
+    ;
+
+PackageDeclaration
+    : PackageModifiers PACKAGE PackageDeclarationPackageName SEMICOLON
+    ;
+
+PackageDeclarationPackageName
+    : Identifier
+    | PackageDeclarationPackageName DOT Identifier
+    ;
+
+// ============================================================================
+// Import Declarations
+// ============================================================================
+OptionalImportDeclarations
+    : /* empty */
+    | ImportDeclarations
+    ;
+
+ImportDeclarations
+    : ImportDeclaration
+    | ImportDeclarations ImportDeclaration
+    ;
+
+ImportDeclaration
+    : SingleTypeImportDeclaration
+    | TypeImportOnDemandDeclaration
+    | SingleStaticImportDeclaration
+    | StaticImportOnDemandDeclaration
+    ;
+
+SingleTypeImportDeclaration
+    : IMPORT TypeName SEMICOLON
+    ;
+
+TypeImportOnDemandDeclaration
+    : IMPORT PackageOrTypeName DOT Splat SEMICOLON
+    ;
+
+SingleStaticImportDeclaration
+    : IMPORT STATIC TypeName DOT Identifier SEMICOLON
+    ;
+
+StaticImportOnDemandDeclaration
+    : IMPORT STATIC TypeName DOT Splat SEMICOLON
+    ;
+
+// Helper rule for on demand imports.
+Splat
+    : TIMES
+    ;
+
+// ============================================================================
+// Top Level Declarations
+// ============================================================================
+TopLevelClassOrInterfaceDeclarations
+    : /* empty */
+    | TopLevelClassOrInterfaceDeclaration TopLevelClassOrInterfaceDeclarations
+    ;
+
+TopLevelClassOrInterfaceDeclaration
+    : ClassDeclaration
+    | InterfaceDeclaration
+    ;
+
+// ============================================================================
 // Class/Interface Declarations
 // ============================================================================
 // Class declaration
@@ -48,6 +187,27 @@ AnnotationInterfaceDeclaration
 // ============================================================================
 // Modifiers
 // ============================================================================
+// Requires modifiers
+RequiresModifiers
+    : /* empty */
+    | RequiresModifier RequiresModifiers
+    ;
+
+RequiresModifier
+    : TRANSITIVE
+    | STATIC
+    ;
+
+// Package modifiers
+PackageModifiers
+    : /* empty */
+    | PackageModifier PackageModifiers
+    ;
+
+PackageModifier
+    : Annotation
+    ;
+
 // Class modifiers
 ClassModifiers
     : /* empty */
@@ -540,6 +700,10 @@ ElementValue
 // Names and Identifiers
 // ============================================================================
 // Module name
+ModuleNameList
+    : ModuleName
+    | ModuleName COMMA ModuleNameList
+    ;
 ModuleName
     : Identifier
     | ModuleName DOT Identifier
