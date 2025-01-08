@@ -4,10 +4,40 @@
 
 %%
 
+// ============================================================================
+// Class/Interface Declarations
+// ============================================================================
+// Class declaration
+ClassDeclaration
+    : NormalClassDeclaration
+    | EnumDeclaration
+    | RecordDeclaration
+    ;
+
+// Normal Class Declaration
+NormalClassDeclaration
+    : ClassModifiers CLASS TypeIdentifier TypeParameters ClassExtends OptionalClassImplements ClassPermits ClassBody
+    ;
+
+// Enum declaration
+EnumDeclaration
+    : ClassModifiers ENUM TypeIdentifier OptionalClassImplements EnumBody
+    ;
+
+// Record declaration
+RecordDeclaration
+    : ClassModifiers RECORD TypeIdentifier TypeParameters RecordHeader OptionalClassImplements RecordBody
+    ;
+
 // Interface declaration
 InterfaceDeclaration
     : NormalInterfaceDeclaration
     | AnnotationInterfaceDeclaration
+    ;
+
+// Normal interface declaration
+NormalInterfaceDeclaration
+    : InterfaceModifiers INTERFACE TypeIdentifier TypeParameters OptionalInterfaceExtends InterfacePermits InterfaceBody
     ;
 
 // Annotation interface declaration
@@ -15,55 +45,26 @@ AnnotationInterfaceDeclaration
     : InterfaceModifiers AT INTERFACE TypeIdentifier AnnotationInterfaceBody
     ;
 
-// Annotation interface body
-AnnotationInterfaceBody
-    : LBRACE AnnotationInterfaceMemberDeclarations RBRACE
-    ;
-
-// Annotation interface member declarations
-AnnotationInterfaceMemberDeclarations
+// ============================================================================
+// Modifiers
+// ============================================================================
+// Class modifiers
+ClassModifiers
     : /* empty */
-    | AnnotationInterfaceMemberDeclaration AnnotationInterfaceMemberDeclarations
+    | ClassModifier ClassModifiers
     ;
 
-AnnotationInterfaceMemberDeclaration
-    : AnnotationInterfaceElementDeclaration
-    | ConstantDeclaration
-    | ClassDeclaration
-    | InterfaceDeclaration
-    | SEMICOLON
-    ;
-
-// Annotation interface element declaration
-AnnotationInterfaceElementDeclaration
-    : AnnotationInterfaceElementModifiers UnannType Identifier LPAREN RPAREN OptionalDims OptionalDefaultValue SEMICOLON
-    ;
-
-// Annotation interface element modifiers
-AnnotationInterfaceElementModifiers
-    : /* empty */
-    | AnnotationInterfaceElementModifier AnnotationInterfaceElementModifiers
-    ;
-
-AnnotationInterfaceElementModifier
+ClassModifier
     : Annotation
     | PUBLIC
+    | PROTECTED
+    | PRIVATE
     | ABSTRACT
-    ;
-
-// Default value
-OptionalDefaultValue
-    : /* empty */
-    | DefaultValue
-    ;
-
-DefaultValue
-    : DEFAULT ElementValue
-    ;
-
-// Normal interface declaration
-NormalInterfaceDeclaration
-    : InterfaceModifiers INTERFACE TypeIdentifier TypeParameters OptionalInterfaceExtends InterfacePermits InterfaceBody
+    | STATIC
+    | FINAL
+    | SEALED
+    | NON_SEALED
+    | STRICTFP
     ;
 
 // Interface modifiers
@@ -84,6 +85,279 @@ InterfaceModifier
     | STRICTFP
     ;
 
+// Member modifiers
+// Annotation interface element modifiers
+AnnotationInterfaceElementModifiers
+    : /* empty */
+    | AnnotationInterfaceElementModifier AnnotationInterfaceElementModifiers
+    ;
+
+AnnotationInterfaceElementModifier
+    : Annotation
+    | PUBLIC
+    | ABSTRACT
+    ;
+
+// Enum constant modifiers
+EnumConstantModifiers
+    : /* empty */
+    | EnumConstantModifier EnumConstantModifiers
+    ;
+
+EnumConstantModifier
+    : Annotation
+    ;
+
+// Constant modifiers
+ConstantModifiers
+    : /* empty */
+    | ConstantModifier ConstantModifiers
+    ;
+
+ConstantModifier
+    : Annotation
+    | PUBLIC
+    | STATIC
+    | FINAL
+    ;
+
+// Constructor modifiers
+ConstructorModifiers
+    : /* empty */
+    | ConstructorModifier ConstructorModifiers
+    ;
+
+ConstructorModifier
+    : Annotation
+    | PUBLIC
+    | PROTECTED
+    | PRIVATE
+    ;
+
+// Method Modifiers
+MethodModifiers
+    : /* empty */
+    | MethodModifier MethodModifiers
+    ;
+
+MethodModifier
+    : Annotation
+    | PUBLIC
+    | PROTECTED
+    | PRIVATE
+    | ABSTRACT
+    | STATIC
+    | FINAL
+    | SYNCHRONIZED
+    | NATIVE
+    | STRICTFP
+    ;
+
+// Field Modifiers
+FieldModifiers
+    : /* empty */
+    | FieldModifier FieldModifiers
+    ;
+
+FieldModifier
+    : Annotation
+    | PUBLIC
+    | PROTECTED
+    | PRIVATE
+    | STATIC
+    | FINAL
+    | TRANSIENT
+    | VOLATILE
+    ;
+
+// Record component modifiers
+RecordComponentModifiers:
+    : /* empty */
+    | RecordComponentModifier RecordComponentModifiers
+    ;
+
+RecordComponentModifier
+    : Annotation
+    ;
+
+// Interface method modifiers
+InterfaceMethodModifiers
+    : /* empty */
+    | InterfaceMethodModifier InterfaceMethodModifiers
+    ;
+
+InterfaceMethodModifier
+    : Annotation
+    | PUBLIC
+    | PRIVATE
+    | ABSTRACT
+    | DEFAULT
+    | STATIC
+    | STRICTFP
+    ;
+
+// ============================================================================
+// Bodies
+// ============================================================================
+// Class bodies
+// Normal class body
+OptionalClassBody
+    : /* empty */
+    | ClassBody
+    ;
+
+ClassBody
+    : LBRACE ClassBodyDeclarations RBRACE
+    ;
+
+// Enum class body
+EnumBody
+    : LBRACE OptionalEnumConstantList OptionalComma EnumBodyDeclarations RBRACE
+    ;
+
+// Record class body
+RecordBody
+    : LBRACE RecordBodyDeclarations RBRACE
+    ;
+
+// Interface bodies
+// Normal interface body
+InterfaceBody
+    : LBRACE InterfaceMemberDeclarations RBRACE
+    ;
+
+// Annotation interface body
+AnnotationInterfaceBody
+    : LBRACE AnnotationInterfaceMemberDeclarations RBRACE
+    ;
+
+
+// Constructor body
+ConstructorBody
+    : LBRACE OptionalExplicitConstructorInvocation BlockStatements RBRACE
+    ;
+
+// ============================================================================
+// Body Member declarations
+// ============================================================================
+// Class body declarations
+ClassBodyDeclarations
+    : /* empty */
+    | ClassBodyDeclaration ClassBodyDeclarations
+    ;
+
+ClassBodyDeclaration
+    : ClassMemberDeclaration
+    | InstanceInitializer
+    | StaticInitializer
+    | ConstructorDeclaration
+    ;
+
+// Enum body member declarations
+EnumBodyDeclarations
+    : /* empty */
+    | SEMICOLON ClassBodyDeclarations
+    ;
+
+// Record body declarations
+RecordBodyDeclarations
+    : /* empty */
+    | RecordBodyDeclaration RecordBodyDeclarations
+    ;
+
+RecordBodyDeclaration
+    : ClassBodyDeclaration
+    | CompactConstructorDeclaration
+    ;
+
+// Interface body member declarations
+InterfaceMemberDeclarations
+    : /* empty */
+    | InterfaceMemberDeclaration InterfaceMemberDeclarations
+    ;
+
+InterfaceMemberDeclaration
+    : ConstantDeclaration
+    | InterfaceMethodDeclaration
+    | ClassDeclaration
+    | InterfaceDeclaration
+    | SEMICOLON
+    ;
+
+// Annotation interface member declarations
+AnnotationInterfaceMemberDeclarations
+    : /* empty */
+    | AnnotationInterfaceMemberDeclaration AnnotationInterfaceMemberDeclarations
+    ;
+
+AnnotationInterfaceMemberDeclaration
+    : AnnotationInterfaceElementDeclaration
+    | ConstantDeclaration
+    | ClassDeclaration
+    | InterfaceDeclaration
+    | SEMICOLON
+    ;
+
+// ============================================================================
+// Class/Interface member declarations
+// ============================================================================
+// Class member declaration
+ClassMemberDeclaration
+    : FieldDeclaration
+    | MethodDeclaration
+    | ClassDeclaration
+    | InterfaceDeclaration
+    | SEMICOLON
+    ;
+// Constructor declaration
+ConstructorDeclaration
+    : ConstructorModifiers ConstructorDeclarator OptionalThrows ConstructorBody
+    ;
+
+// Compact constructor declaration
+CompactConstructorDeclaration
+    : ConstructorModifiers SimpleTypeName ConstructorBody
+    ;
+
+// Field declaration
+FieldDeclaration
+    : FieldModifiers UnannType VariableDeclaratorList SEMICOLON
+    ;
+
+// Method declaration
+MethodDeclaration
+    : MethodModifiers MethodHeader MethodBody
+    ;
+
+// Constant declaration
+ConstantDeclaration
+    : ConstantModifiers UnannType VariableDeclaratorList SEMICOLON
+    ;
+
+// Interface method declaration
+InterfaceMethodDeclaration
+    : InterfaceMethodModifiers MethodHeader MethodBody
+    ;
+
+// Annotation interface element declaration
+AnnotationInterfaceElementDeclaration
+    : AnnotationInterfaceElementModifiers UnannType Identifier LPAREN RPAREN OptionalDims OptionalDefaultValue SEMICOLON
+    ;
+
+// ============================================================================
+// Initializers
+// ============================================================================
+InstanceInitializer
+    : Block
+    ;
+
+StaticInitializer
+    : STATIC Block
+    ;
+
+// ============================================================================
+// Extends/Implements/Permits
+// ============================================================================
 // Interface extends
 OptionalInterfaceExtends
     : /* empty */
@@ -104,92 +378,227 @@ InterfacePermits
     : PERMITS TypeNameList
     ;
 
-// Interface body
-InterfaceBody
-    : LBRACE InterfaceMemberDeclarations RBRACE
-    ;
 
-InterfaceMemberDeclarations
+// Class extends
+ClassExtends
     : /* empty */
-    | InterfaceMemberDeclaration InterfaceMemberDeclarations
+    | EXTENDS ClassType
     ;
-
-InterfaceMemberDeclaration
-    : ConstantDeclaration
-    | InterfaceMethodDeclaration
-    | ClassDeclaration
-    | InterfaceDeclaration
-    | SEMICOLON
-    ;
-
-// Interface method declaration
-InterfaceMethodDeclaration
-    : InterfaceMethodModifiers MethodHeader MethodBody
-    ;
-
-InterfaceMethodModifiers
+// Class implements
+OptionalClassImplements
     : /* empty */
-    | InterfaceMethodModifier InterfaceMethodModifiers
+    | ClassImplements
     ;
 
-InterfaceMethodModifier
-    : Annotation
-    | PUBLIC
-    | PRIVATE
-    | ABSTRACT
-    | DEFAULT
-    | STATIC
-    | STRICTFP
+ClassImplements
+    : IMPLEMENTS InterfaceTypeList
     ;
 
-// Constant declaration
-ConstantDeclaration
-    : ConstantModifiers UnannType VariableDeclaratorList SEMICOLON
+InterfaceTypeList
+    : InterfaceType
+    | InterfaceType COMMA InterfaceTypeList
     ;
 
-// Constant modifiers
-ConstantModifiers
+// Class permits
+ClassPermits
     : /* empty */
-    | ConstantModifier ConstantModifiers
+    | PERMITS TypeNameList
     ;
 
-ConstantModifier
-    : Annotation
-    | PUBLIC
-    | STATIC
-    | FINAL
+// ============================================================================
+// Types
+// ============================================================================
+Type
+    : PrimitiveType
+    | ReferenceType
     ;
 
-// Class declaration
-ClassDeclaration
-    : NormalClassDeclaration
-    | EnumDeclaration
-    | RecordDeclaration
+// Primitive type
+PrimitiveType
+    : Annotations NumericType
+    | Annotations BOOLEAN
     ;
 
-// Record declaration
-RecordDeclaration
-    : ClassModifiers RECORD TypeIdentifier TypeParameters RecordHeader OptionalClassImplements RecordBody
+// Reference type
+ReferenceType
+    : ClassOrInterfaceType
+    | TypeVariable
+    | ArrayType
     ;
 
-// Record body
-RecordBody
-    : LBRACE RecordBodyDeclarations RBRACE
+// ============================================================================
+// Numeric Types
+// ============================================================================
+NumericType
+    : IntegralType
+    | FloatingPointType
     ;
 
-RecordBodyDeclarations
+// Integral type
+IntegralType
+    : BYTE
+    | SHORT
+    | INT
+    | LONG
+    | CHAR
+    ;
+
+// Floating point type
+FloatingPointType
+    : FLOAT
+    | DOUBLE
+    ;
+
+// ============================================================================
+// Reference Types
+// ============================================================================
+// Class or interface type
+ClassOrInterfaceType
+    : ClassType
+    | InterfaceType
+    ;
+
+// Type variable
+TypeVariable
+    : Annotations TypeIdentifier
+    ;
+
+// Array type
+ArrayType
+    : PrimitiveType Dims
+    | ClassOrInterfaceType Dims
+    | TypeVariable Dims
+    ;
+
+// ============================================================================
+// Class or Interface Types
+// ============================================================================
+// Class type
+ClassType
+    : Annotations TypeIdentifier OptionalTypeArguments
+    | PackageName DOT Annotations TypeIdentifier OptionalTypeArguments
+    | ClassOrInterfaceType DOT Annotations TypeIdentifier OptionalTypeArguments
+    ;
+
+// Interface type
+InterfaceType
+    : ClassType
+    ;
+
+// ============================================================================
+// Annotations
+// ============================================================================
+Annotations
     : /* empty */
-    | RecordBodyDeclaration RecordBodyDeclarations
+    | Annotation Annotations
     ;
 
-RecordBodyDeclaration
-    : ClassBodyDeclaration
-    | CompactConstructorDeclaration
+// Annotation
+Annotation
+    : NormalAnnotation
+    | MarkerAnnotation
+    | SingleElementAnnotation
     ;
 
-CompactConstructorDeclaration
-    : ConstructorModifiers SimpleTypeName ConstructorBody
+// Normal annotation
+NormalAnnotation
+    : AT TypeName LPAREN ElementValuePairList RPAREN
     ;
+
+// Marker annotation
+MarkerAnnotation
+    : AT TypeName
+    ;
+
+// Single element annotation
+SingleElementAnnotation
+    : AT TypeName LPAREN ElementValue RPAREN
+    ;
+
+// ============================================================================
+// Element Values
+// ============================================================================
+// Element value pair list
+ElementValuePairList
+    : ElementValuePair
+    | ElementValuePair COMMA ElementValuePairList
+    ;
+
+// Element value pair
+ElementValuePair
+    : Identifier ASSIGN ElementValue
+    ;
+
+// Element value
+ElementValue
+    : ConditionalExpression
+    | ElementValueArrayInitializer
+    | Annotation
+    ;
+
+// ============================================================================
+// Names and Identifiers
+// ============================================================================
+// Module name
+ModuleName
+    : Identifier
+    | ModuleName DOT Identifier
+    ;
+// Package or type name
+PackageOrTypeName
+    : Identifier
+    | PackageOrTypeName DOT Identifier
+    ;
+
+// Package Name
+PackageName
+    : Identifier
+    | PackageName DOT Identifier
+    ;
+
+// Type names
+TypeNameList
+    : TypeName
+    | TypeName COMMA TypeNameList
+    ;
+
+TypeName
+    : PackageOrTypeName DOT TypeIdentifier
+    | TypeIdentifier
+    ;
+
+SimpleTypeName
+    : TypeIdentifier
+    ;
+
+// Expression Name
+ExpressionName
+    : Identifier
+    | AmbiguousName DOT Identifier
+    ;
+
+// Ambiguous Name
+AmbiguousName
+    : Identifier
+    | AmbiguousName DOT Identifier
+    ;
+// ============================================================================
+// Expressions
+// ============================================================================
+
+// ============================================================================
+// Statements
+// ============================================================================
+// Default value
+OptionalDefaultValue
+    : /* empty */
+    | DefaultValue
+    ;
+
+DefaultValue
+    : DEFAULT ElementValue
+    ;
+
 
 // Record Header
 RecordHeader
@@ -211,37 +620,8 @@ RecordComponent
     | VariableArityRecordComponent
     ;
 
-RecordComponentModifiers:
-    : /* empty */
-    | RecordComponentModifier RecordComponentModifiers
-    ;
-
-RecordComponentModifier
-    : Annotation
-    ;
-
 VariableArityRecordComponent
     : RecordComponentModifiers UnannType Annotations DOT DOT DOT Identifier
-    ;
-
-// Enum declaration
-EnumDeclaration
-    : ClassModifiers ENUM TypeIdentifier OptionalClassImplements EnumBody
-    ;
-
-// Enum body
-EnumBody
-    : LBRACE OptionalEnumConstantList OptionalComma EnumBodyDeclarations RBRACE
-    ;
-
-EnumBodyDeclarations
-    : /* empty */
-    | SEMICOLON EnumBodyDeclarationList
-    ;
-
-EnumBodyDeclarationList
-    : /* empty */
-    | EnumBodyDeclaration EnumBodyDeclarationList
     ;
 
 // Enum constants
@@ -259,61 +639,9 @@ EnumConstant
     : EnumConstantModifiers Identifier OptionalParenthesizedArguments OptionalClassBody
     ;
 
-EnumConstantModifiers
-    : /* empty */
-    | EnumConstantModifier EnumConstantModifiers
-    ;
-
-EnumConstantModifier
-    : Annotation
-    ;
-
 OptionalParenthesizedArguments
     : /* empty */
     | LPAREN OptionalArgumentList RPAREN
-    ;
-// Normal Class Declaration
-NormalClassDeclaration
-    : ClassModifiers CLASS TypeIdentifier TypeParameters ClassExtends OptionalClassImplements ClassPermits ClassBody
-    ;
-
-// Class body
-OptionalClassBody
-    : /* empty */
-    | ClassBody
-    ;
-
-ClassBody
-    : LBRACE ClassBodyDeclarations RBRACE
-    ;
-
-ClassBodyDeclarations
-    : /* empty */
-    | ClassBodyDeclaration ClassBodyDeclarations
-    ;
-
-ClassBodyDeclaration
-    : ClassMemberDeclaration
-    | InstanceInitializer
-    | StaticInitializer
-    | ConstructorDeclaration
-    ;
-
-InstanceInitializer
-    : Block
-    ;
-
-StaticInitializer
-    : STATIC Block
-    ;
-
-// Constructor declaration
-ConstructorDeclaration
-    : ConstructorModifiers ConstructorDeclarator OptionalThrows ConstructorBody
-    ;
-
-ConstructorBody
-    : LBRACE OptionalExplicitConstructorInvocation BlockStatements RBRACE
     ;
 
 // Explicit constructor invocation
@@ -337,40 +665,6 @@ ConstructorDeclarator
     | SimpleTypeName LPAREN FormalParameterList RPAREN
     | TypeParameters SimpleTypeName LPAREN RPAREN
     | SimpleTypeName LPAREN RPAREN
-    ;
-
-SimpleTypeName
-    : TypeIdentifier
-    ;
-
-// Constructor modifiers
-ConstructorModifiers
-    : /* empty */
-    | ConstructorModifier ConstructorModifiers
-    ;
-
-ConstructorModifier
-    : Annotation
-    | PUBLIC
-    | PROTECTED
-    | PRIVATE
-    ;
-
-// Class member declaration
-ClassMemberDeclaration
-    : FieldDeclaration
-    | MethodDeclaration
-    | ClassDeclaration
-    | InterfaceDeclaration
-    | SEMICOLON
-    ;
-
-FieldDeclaration
-    : FieldModifiers UnannType VariableDeclaratorList SEMICOLON
-    ;
-
-MethodDeclaration
-    : MethodModifiers MethodHeader MethodBody
     ;
 
 MethodBody
@@ -437,136 +731,6 @@ VariableArityParameter
     : VariableModifierList UnannType Annotations DOT DOT DOT Identifier
     ;
 
-// Method Modifiers
-MethodModifiers
-    : /* empty */
-    | MethodModifier MethodModifiers
-    ;
-
-MethodModifier
-    : Annotation
-    | PUBLIC
-    | PROTECTED
-    | PRIVATE
-    | ABSTRACT
-    | STATIC
-    | FINAL
-    | SYNCHRONIZED
-    | NATIVE
-    | STRICTFP
-    ;
-
-// Field Modifiers
-FieldModifiers
-    : /* empty */
-    | FieldModifier FieldModifiers
-    ;
-
-FieldModifier
-    : Annotation
-    | PUBLIC
-    | PROTECTED
-    | PRIVATE
-    | STATIC
-    | FINAL
-    | TRANSIENT
-    | VOLATILE
-    ;
-
-// Class modifiers
-ClassModifiers
-    : /* empty */
-    | ClassModifier ClassModifiers
-    ;
-
-ClassModifier
-    : Annotation
-    | PUBLIC
-    | PROTECTED
-    | PRIVATE
-    | ABSTRACT
-    | STATIC
-    | FINAL
-    | SEALED
-    | NON_SEALED
-    | STRICTFP
-    ;
-
-// Class extends
-ClassExtends
-    : /* empty */
-    | EXTENDS ClassType
-    ;
-// Class implements
-OptionalClassImplements
-    : /* empty */
-    | ClassImplements
-    ;
-
-ClassImplements
-    : IMPLEMENTS InterfaceTypeList
-    ;
-
-InterfaceTypeList
-    : InterfaceType
-    | InterfaceType COMMA InterfaceTypeList
-    ;
-
-// Class permits
-ClassPermits
-    : /* empty */
-    | PERMITS TypeNameList
-    ;
-
-TypeNameList
-    : TypeName
-    | TypeName COMMA TypeNameList
-    ;
-
-TypeName
-    : PackageOrTypeName DOT TypeIdentifier
-    | TypeIdentifier
-    ;
-
-PackageOrTypeName
-    : Identifier
-    | PackageOrTypeName DOT Identifier
-    ;
-
-ExpressionName
-    : Identifier
-    | AmbiguousName DOT Identifier
-    ;
-
-AmbiguousName
-    : Identifier
-    | AmbiguousName DOT Identifier
-    ;
-
-// Reference type
-ReferenceType
-    : ClassOrInterfaceType
-    | TypeVariable
-    | ArrayType
-    ;
-
-// Class or interface type
-ClassOrInterfaceType
-    : ClassType
-    | InterfaceType
-    ;
-// Interface type
-InterfaceType
-    : ClassType
-    ;
-
-// Class type
-ClassType
-    : Annotations TypeIdentifier OptionalTypeArguments
-    | PackageName DOT Annotations TypeIdentifier OptionalTypeArguments
-    | ClassOrInterfaceType DOT Annotations TypeIdentifier OptionalTypeArguments
-    ;
-
 OptionalTypeArgumentsOrDiamond
     : /* empty */
     | TypeArgumentsOrDiamond
@@ -606,45 +770,10 @@ WildcardBounds
     | SUPER ReferenceType
     ;
 
-// Array type
-ArrayType
-    : PrimitiveType Dims
-    | ClassOrInterfaceType Dims
-    | TypeVariable Dims
-    ;
-
+// Dims
 Dims
     : Annotations LBRACKET RBRACKET
     | Annotations LBRACKET RBRACKET Dims
-    ;
-
-// Type variable
-TypeVariable
-    : Annotations TypeIdentifier
-    ;
-
-// Primitive type
-PrimitiveType
-    : Annotations NumericType
-    | Annotations BOOLEAN
-    ;
-
-NumericType
-    : IntegralType
-    | FloatingPointType
-    ;
-
-IntegralType
-    : BYTE
-    | SHORT
-    | INT
-    | LONG
-    | CHAR
-    ;
-
-FloatingPointType
-    : FLOAT
-    | DOUBLE
     ;
 
 // Type parameters
@@ -688,46 +817,6 @@ AdditionalBound
 // Define the TypeIdentifier rule using this: https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-TypeIdentifier
 TypeIdentifier
     : Identifier
-    ;
-
-// Annotations
-Annotations
-    : /* empty */
-    | Annotation Annotations
-    ;
-
-// Annotation rules https://docs.oracle.com/javase/specs/jls/se23/html/jls-9.html#jls-Annotation
-Annotation
-    : NormalAnnotation
-    | MarkerAnnotation
-    | SingleElementAnnotation
-    ;
-
-SingleElementAnnotation
-    : AT TypeName LPAREN ElementValue RPAREN
-    ;
-
-MarkerAnnotation
-    : AT TypeName
-    ;
-
-NormalAnnotation
-    : AT TypeName LPAREN ElementValuePairList RPAREN
-    ;
-
-ElementValuePairList
-    : ElementValuePair
-    | ElementValuePair COMMA ElementValuePairList
-    ;
-
-ElementValuePair
-    : Identifier ASSIGN ElementValue
-    ;
-
-ElementValue
-    : ConditionalExpression
-    | ElementValueArrayInitializer
-    | Annotation
     ;
 
 ElementValueArrayInitializer
