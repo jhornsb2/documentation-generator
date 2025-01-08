@@ -5,14 +5,159 @@
 %%
 
 // Interface declaration
-// TODO
 InterfaceDeclaration
     : NormalInterfaceDeclaration
-    | AnnotationTypeDeclaration
+    | AnnotationInterfaceDeclaration
     ;
 
+// Annotation interface declaration
+AnnotationInterfaceDeclaration
+    : InterfaceModifiers AT INTERFACE TypeIdentifier AnnotationInterfaceBody
+    ;
+
+// Annotation interface body
+AnnotationInterfaceBody
+    : LBRACE AnnotationInterfaceMemberDeclarations RBRACE
+    ;
+
+// Annotation interface member declarations
+AnnotationInterfaceMemberDeclarations
+    : /* empty */
+    | AnnotationInterfaceMemberDeclaration AnnotationInterfaceMemberDeclarations
+    ;
+
+AnnotationInterfaceMemberDeclaration
+    : AnnotationInterfaceElementDeclaration
+    | ConstantDeclaration
+    | ClassDeclaration
+    | InterfaceDeclaration
+    | SEMICOLON
+    ;
+
+// Annotation interface element declaration
+AnnotationInterfaceElementDeclaration
+    : AnnotationInterfaceElementModifiers UnannType Identifier LPAREN RPAREN OptionalDims OptionalDefaultValue SEMICOLON
+    ;
+
+// Annotation interface element modifiers
+AnnotationInterfaceElementModifiers
+    : /* empty */
+    | AnnotationInterfaceElementModifier AnnotationInterfaceElementModifiers
+    ;
+
+AnnotationInterfaceElementModifier
+    : Annotation
+    | PUBLIC
+    | ABSTRACT
+    ;
+
+// Default value
+OptionalDefaultValue
+    : /* empty */
+    | DefaultValue
+    ;
+
+DefaultValue
+    : DEFAULT ElementValue
+    ;
+
+// Normal interface declaration
 NormalInterfaceDeclaration
-    : // TODO https://docs.oracle.com/javase/specs/jls/se23/html/jls-9.html#jls-NormalInterfaceDeclaration
+    : InterfaceModifiers INTERFACE TypeIdentifier TypeParameters OptionalInterfaceExtends InterfacePermits InterfaceBody
+    ;
+
+// Interface modifiers
+InterfaceModifiers
+    : /* empty */
+    | InterfaceModifier InterfaceModifiers
+    ;
+
+InterfaceModifier
+    : Annotation
+    | PUBLIC
+    | PROTECTED
+    | PRIVATE
+    | ABSTRACT
+    | STATIC
+    | SEALED
+    | NON_SEALED
+    | STRICTFP
+    ;
+
+// Interface extends
+OptionalInterfaceExtends
+    : /* empty */
+    | InterfaceExtends
+    ;
+
+InterfaceExtends
+    : EXTENDS InterfaceTypeList
+    ;
+
+// Interface permits
+OptionalInterfacePermits
+    : /* empty */
+    | InterfacePermits
+    ;
+
+InterfacePermits
+    : PERMITS TypeNameList
+    ;
+
+// Interface body
+InterfaceBody
+    : LBRACE InterfaceMemberDeclarations RBRACE
+    ;
+
+InterfaceMemberDeclarations
+    : /* empty */
+    | InterfaceMemberDeclaration InterfaceMemberDeclarations
+    ;
+
+InterfaceMemberDeclaration
+    : ConstantDeclaration
+    | InterfaceMethodDeclaration
+    | ClassDeclaration
+    | InterfaceDeclaration
+    | SEMICOLON
+    ;
+
+// Interface method declaration
+InterfaceMethodDeclaration
+    : InterfaceMethodModifiers MethodHeader MethodBody
+    ;
+
+InterfaceMethodModifiers
+    : /* empty */
+    | InterfaceMethodModifier InterfaceMethodModifiers
+    ;
+
+InterfaceMethodModifier
+    : Annotation
+    | PUBLIC
+    | PRIVATE
+    | ABSTRACT
+    | DEFAULT
+    | STATIC
+    | STRICTFP
+    ;
+
+// Constant declaration
+ConstantDeclaration
+    : ConstantModifiers UnannType VariableDeclaratorList SEMICOLON
+    ;
+
+// Constant modifiers
+ConstantModifiers
+    : /* empty */
+    | ConstantModifier ConstantModifiers
+    ;
+
+ConstantModifier
+    : Annotation
+    | PUBLIC
+    | STATIC
+    | FINAL
     ;
 
 // Class declaration
