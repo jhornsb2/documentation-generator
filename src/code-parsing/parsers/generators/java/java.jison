@@ -364,6 +364,28 @@ InterfaceMethodModifier
     | STRICTFP
     ;
 
+// Variable modifiers
+VariableModifierList
+    : /* empty */
+    | VariableModifier
+    | VariableModifier VariableModifierList
+    ;
+
+VariableModifier
+    : ANNOTATIONS
+    | FINAL
+    ;
+
+// Type parameter modifiers
+TypeParameterModifiers
+    : /* empty */
+    | TypeParameterModifier TypeParameterModifiers
+    ;
+
+TypeParameterModifier
+    : Annotation
+    ;
+
 // ============================================================================
 // Bodies
 // ============================================================================
@@ -510,6 +532,49 @@ InterfaceMethodDeclaration
 // Annotation interface element declaration
 AnnotationInterfaceElementDeclaration
     : AnnotationInterfaceElementModifiers UnannType Identifier LPAREN RPAREN OptionalDims OptionalDefaultValue SEMICOLON
+    ;
+
+// Annotation interface element declaration default value
+OptionalDefaultValue
+    : /* empty */
+    | DefaultValue
+    ;
+
+DefaultValue
+    : DEFAULT ElementValue
+    ;
+
+// ============================================================================
+// Headers
+// ============================================================================
+// Record Header
+RecordHeader
+    : LPAREN OptionalRecordComponentList RPAREN
+    ;
+
+OptionalRecordComponentList
+    : /* empty */
+    | RecordComponentList
+    ;
+
+RecordComponentList
+    : RecordComponent
+    | RecordComponent COMMA RecordComponentList
+    ;
+
+RecordComponent
+    : RecordComponentModifiers UnannType Identifier
+    | VariableArityRecordComponent
+    ;
+
+VariableArityRecordComponent
+    : RecordComponentModifiers UnannType Annotations DOT DOT DOT Identifier
+    ;
+
+// Method header
+MethodHeader
+    : Result MethodDeclarator OptionalThrows
+    | TypeParameters Annotations Result MethodDeclarator OptionalThrows
     ;
 
 // ============================================================================
@@ -755,46 +820,52 @@ AmbiguousName
     | AmbiguousName DOT Identifier
     ;
 // ============================================================================
-// Expressions
-// ============================================================================
-
-// ============================================================================
 // Statements
 // ============================================================================
-// Default value
-OptionalDefaultValue
+// Explicit constructor invocation
+OptionalExplicitConstructorInvocation
     : /* empty */
-    | DefaultValue
+    | ExplicitConstructorInvocation
     ;
 
-DefaultValue
-    : DEFAULT ElementValue
+ExplicitConstructorInvocation
+    : OptionalTypeArguments THIS LPAREN OptionalArgumentList RPAREN SEMICOLON
+    | OptionalTypeArguments SUPER LPAREN OptionalArgumentList RPAREN SEMICOLON
+    | ExpressionName DOT OptionalTypeArguments SUPER LPAREN OptionalArgumentList RPAREN SEMICOLON
+    | Primary DOT OptionalTypeArguments SUPER LPAREN OptionalArgumentList RPAREN SEMICOLON
     ;
 
-
-// Record Header
-RecordHeader
-    : LPAREN OptionalRecordComponentList RPAREN
-    ;
-
-OptionalRecordComponentList
+// Block Statements
+BlockStatements
     : /* empty */
-    | RecordComponentList
+    | BlockStatement BlockStatements
     ;
 
-RecordComponentList
-    : RecordComponent
-    | RecordComponent COMMA RecordComponentList
+BlockStatement
+    : LocalClassOrInterfaceDeclaration
+    | LocalVariableDeclarationStatement
+    | Statement
     ;
 
-RecordComponent
-    : RecordComponentModifiers UnannType Identifier
-    | VariableArityRecordComponent
+// Local class or interface declaration
+LocalClassOrInterfaceDeclaration
+    : ClassDeclaration
+    | NormalInterfaceDeclaration
     ;
 
-VariableArityRecordComponent
-    : RecordComponentModifiers UnannType Annotations DOT DOT DOT Identifier
+// Local Variable Declaration
+LocalVariableDeclarationStatement
+    : LocalVariableDeclaration SEMICOLON
     ;
+
+// Statement TODO
+Statement
+    : // TODO: https://docs.oracle.com/javase/specs/jls/se23/html/jls-14.html#jls-Statement
+    ;
+
+// ============================================================================
+// Expressions
+// ============================================================================
 
 // Enum constants
 OptionalEnumConstantList
@@ -816,19 +887,6 @@ OptionalParenthesizedArguments
     | LPAREN OptionalArgumentList RPAREN
     ;
 
-// Explicit constructor invocation
-OptionalExplicitConstructorInvocation
-    : /* empty */
-    | ExplicitConstructorInvocation
-    ;
-
-ExplicitConstructorInvocation
-    : OptionalTypeArguments THIS LPAREN OptionalArgumentList RPAREN SEMICOLON
-    | OptionalTypeArguments SUPER LPAREN OptionalArgumentList RPAREN SEMICOLON
-    | ExpressionName DOT OptionalTypeArguments SUPER LPAREN OptionalArgumentList RPAREN SEMICOLON
-    | Primary DOT OptionalTypeArguments SUPER LPAREN OptionalArgumentList RPAREN SEMICOLON
-    ;
-
 // Constructor declarator
 ConstructorDeclarator
     : TypeParameters SimpleTypeName LPAREN ReceiverParameter COMMA FormalParameterList RPAREN
@@ -842,11 +900,6 @@ ConstructorDeclarator
 MethodBody
     : Block
     | SEMICOLON
-    ;
-
-MethodHeader
-    : Result MethodDeclarator OptionalThrows
-    | TypeParameters Annotations Result MethodDeclarator OptionalThrows
     ;
 
 OptionalThrows
@@ -961,15 +1014,6 @@ TypeParameterList
 
 TypeParameter
     : TypeParameterModifiers TypeIdentifier TypeBound
-    ;
-
-TypeParameterModifiers
-    : /* empty */
-    | TypeParameterModifier TypeParameterModifiers
-    ;
-
-TypeParameterModifier
-    : Annotation
     ;
 
 TypeBound
@@ -1414,17 +1458,6 @@ NormalLambdaParameter
     | VariableArityParameter
     ;
 
-VariableModifierList
-    : /* empty */
-    | VariableModifier
-    | VariableModifier VariableModifierList
-    ;
-
-VariableModifier
-    : ANNOTATIONS
-    | FINAL
-    ;
-
 VariableDeclaratorId
     : Identifier OptionalDims
     | "_"
@@ -1491,28 +1524,6 @@ Block
     : LBRACE BlockStatements RBRACE
     ;
 
-BlockStatements
-    : /* empty */
-    | BlockStatement BlockStatements
-    ;
-
-BlockStatement
-    : LocalClassOrInterfaceDeclaration
-    | LocalVariableDeclarationStatement
-    | Statement
-    ;
-
-// Local class or interface declaration
-LocalClassOrInterfaceDeclaration
-    : ClassDeclaration
-    | NormalInterfaceDeclaration
-    ;
-
-// Local Variable Declaration
-LocalVariableDeclarationStatement
-    : LocalVariableDeclaration SEMICOLON
-    ;
-
 LocalVariableDeclaration
     : VariableModifierList LocalVariableType VariableDeclaratorList
     ;
@@ -1552,10 +1563,6 @@ VariableInitializerList
     | VariableInitializer COMMA VariableInitializerList
     ;
 
-// Statement TODO
-Statement
-    : // TODO: https://docs.oracle.com/javase/specs/jls/se23/html/jls-14.html#jls-Statement
-    ;
 // Class literal
 ClassLiteral
     : TypeName OptionalEmptyBrackets DOT CLASS
