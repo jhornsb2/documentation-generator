@@ -727,6 +727,21 @@ LambdaParameterType
     | VAR
     ;
 
+// Catch type
+CatchType
+    : UnannClassType OptionalUnionedClassTypeList
+    ;
+
+OptionalUnionedClassTypeList
+    : /* empty */
+    | UnionedClassTypeList
+    ;
+
+UnionedClassTypeList
+    : BITWISE_OR ClassType
+    | UnionedClassTypeList BITWISE_OR ClassType
+    ;
+
 // ============================================================================
 // Numeric Types
 // ============================================================================
@@ -1148,9 +1163,222 @@ LocalVariableDeclarationStatement
     : LocalVariableDeclaration SEMICOLON
     ;
 
-// Statement TODO
-Statement
-    : // TODO: https://docs.oracle.com/javase/specs/jls/se23/html/jls-14.html#jls-Statement
+// Statement
+Statement // https://docs.oracle.com/javase/specs/jls/se23/html/jls-14.html#jls-Statement
+    : StatementWithoutTrailingSubstatement
+    | LabeledStatement
+    | IfThenStatement
+    | IfThenElseStatement
+    | WhileStatement
+    | ForStatement
+    ;
+
+StatementNoShortIf
+    : StatementWithoutTrailingSubstatement
+    | LabeledStatementNoShortIf
+    | IfThenElseStatementNoShortIf
+    | WhileStatementNoShortIf
+    | ForStatementNoShortIf
+    ;
+
+// Statement without trailing substatement
+StatementWithoutTrailingSubstatement
+    : Block
+    | EmptyStatement
+    | ExpressionStatement
+    | AssertStatement
+    | SwitchStatement
+    | DoStatement
+    | BreakStatement
+    | ContinueStatement
+    | ReturnStatement
+    | SynchronizedStatement
+    | ThrowStatement
+    | TryStatement
+    | YieldStatement
+    ;
+
+EmptyStatement
+    : SEMICOLON
+    ;
+
+ExpressionStatement
+    : StatementExpression SEMICOLON
+    ;
+
+AssertStatement
+    : ASSERT Expression SEMICOLON
+    | ASSERT Expression COLON Expression SEMICOLON
+    ;
+
+SwitchStatement
+    : SWITCH LPAREN Expression RPAREN SwitchBlock
+    ;
+
+DoStatement
+    : DO Statement WHILE LPAREN Expression RPAREN SEMICOLON
+    ;
+
+BreakStatement
+    : BREAK Identifier SEMICOLON
+    | BREAK SEMICOLON
+    ;
+
+ContinueStatement
+    : CONTINUE Identifier SEMICOLON
+    | CONTINUE SEMICOLON
+    ;
+
+ReturnStatement
+    : RETURN Expression SEMICOLON
+    | RETURN SEMICOLON
+    ;
+
+SynchronizedStatement
+    : SYNCHRONIZED LPAREN Expression RPAREN Block
+    ;
+
+ThrowStatement
+    : THROW Expression SEMICOLON
+    ;
+
+TryStatement
+    : TRY Block Catches
+    | TRY Block OptionalCatches Finally
+    | TryWithResourcesStatement
+    ;
+
+TryWithResourcesStatement
+    : TRY ResourceSpecification Block OptionalCatches OptionalFinally
+    ;
+
+ResourceSpecification
+    : LPAREN ResourceList OptionalSemicolon RPAREN
+    ;
+
+ResourceList
+    : Resource
+    | Resource SEMICOLON ResourceList
+    ;
+
+Resource
+    : LocalVariableDeclaration
+    | VariableAccess
+    ;
+
+OptionalSemicolon
+    : /* empty */
+    | SEMICOLON
+    ;
+
+OptionalCatches
+    : /* empty */
+    | Catches
+    ;
+
+Catches
+    : CatchClause
+    | Catches CatchClause
+    ;
+
+CatchClause
+    : CATCH LPAREN CatchFormalParameter RPAREN Block
+    ;
+
+CatchFormalParameter
+    : VariableModifierList CatchType VariableDeclaratorId
+    ;
+
+OptionalFinally
+    : /* empty */
+    | Finally
+    ;
+
+Finally
+    : FINALLY Block
+    ;
+
+YieldStatement
+    : YIELD Expression SEMICOLON
+    ;
+
+// Labeled statements
+LabeledStatement
+    : Identifier COLON Statement
+    ;
+
+LabeledStatementNoShortIf
+    : Identifier COLON StatementNoShortIf
+    ;
+
+// If then statements
+IfThenStatement
+    : IF LPAREN Expression RPAREN Statement
+    ;
+
+IfThenElseStatement
+    : IF LPAREN Expression RPAREN StatementNoShortIf ELSE Statement
+    ;
+
+IfThenElseStatementNoShortIf
+    : IF LPAREN Expression RPAREN StatementNoShortIf ELSE StatementNoShortIf
+    ; 
+
+// While statements
+WhileStatement
+    : WHILE LPAREN Expression RPAREN Statement
+    ;
+
+WhileStatementNoShortIf
+    : WHILE LPAREN Expression RPAREN StatementNoShortIf
+    ;
+
+// For statements
+ForStatement
+    : BasicForStatement
+    | EnhancedForStatement
+    ;
+
+ForStatementNoShortIf
+    : BasicForStatementNoShortIf
+    | EnhancedForStatementNoShortIf
+    ;
+
+// Basic for statements
+BasicForStatement
+    : FOR LPAREN OptionalForInit SEMICOLON OptionalExpression SEMICOLON OptionalForUpdate RPAREN Statement
+    ;
+
+BasicForStatementNoShortIf
+    : FOR LPAREN OptionalForInit SEMICOLON OptionalExpression SEMICOLON OptionalForUpdate RPAREN StatementNoShortIf
+    ;
+
+OptionalForInit
+    : /* empty */
+    | ForInit
+    ;
+
+ForInit
+    : StatementExpressionList
+    | LocalVariableDeclaration
+    ;
+
+OptionalForUpdate
+    : /* empty */
+    | ForUpdate
+    ;
+
+ForUpdate
+    : StatementExpressionList
+    ;
+
+// Enhanced for statements
+EnhancedForStatement
+    : FOR LPAREN LocalVariableDeclaration COLON Expression RPAREN Statement
+    ;
+
+EnhancedForStatementNoShortIf
+    : FOR LPAREN LocalVariableDeclaration COLON Expression RPAREN StatementNoShortIf
     ;
 
 // ============================================================================
@@ -1163,6 +1391,22 @@ ParenthesizedExpression
 Expression
     : LambdaExpression
     | AssignmentExpression
+    ;
+
+// Statement expressions
+StatementExpressionList
+    : StatementExpression
+    | StatementExpression COMMA StatementExpressionList
+    ;
+
+StatementExpression
+    : Assignment
+    | PreIncrementExpression
+    | PreDecrementExpression
+    | PostIncrementExpression
+    | PostDecrementExpression
+    | MethodInvocation
+    | ClassInstanceCreationExpression
     ;
 
 // Lambda expression
@@ -1234,6 +1478,11 @@ ArrayAccess
     : ExpressionName LBRACKET Expression RBRACKET
     | PrimaryNoNewArray LBRACKET Expression RBRACKET
     | ArrayCreationExpressionWithInitializer LBRACKET Expression RBRACKET
+    ;
+
+VariableAccess
+    : Expression
+    | FieldAccess
     ;
 
 // Assignment operators
