@@ -11,7 +11,7 @@ whitespace                  \s+
 \/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/    /* ignore multi-line comment */
 
 // documentation comments
-\/\*\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/    return 'DOCCOMMENT';
+\/\*\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/    return 'DOC_COMMENT';
 
 // literals
 {digit}+                                        return 'INTEGER_LITERAL';
@@ -152,4 +152,4 @@ whitespace                  \s+
 "\"                                             return 'BACKSLASH';
 "u"                                             return 'UNICODE_MARKER';
 
-<<EOF>>                                         return 'ENDOFFILE';
+<<EOF>>                                         return 'END_OF_FILE';
