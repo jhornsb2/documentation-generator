@@ -163,7 +163,7 @@ ClassDeclaration
 
 // Normal Class Declaration
 NormalClassDeclaration
-    : ClassModifiers CLASS TypeIdentifier TypeParameters ClassExtends OptionalClassImplements ClassPermits ClassBody
+    : ClassModifiers CLASS TypeIdentifier OptionalTypeParameters ClassExtends OptionalClassImplements ClassPermits ClassBody
     ;
 
 // Enum declaration
@@ -173,7 +173,7 @@ EnumDeclaration
 
 // Record declaration
 RecordDeclaration
-    : ClassModifiers RECORD TypeIdentifier TypeParameters RecordHeader OptionalClassImplements RecordBody
+    : ClassModifiers RECORD TypeIdentifier OptionalTypeParameters RecordHeader OptionalClassImplements RecordBody
     ;
 
 // Interface declaration
@@ -184,7 +184,7 @@ InterfaceDeclaration
 
 // Normal interface declaration
 NormalInterfaceDeclaration
-    : InterfaceModifiers INTERFACE TypeIdentifier TypeParameters OptionalInterfaceExtends InterfacePermits InterfaceBody
+    : InterfaceModifiers INTERFACE TypeIdentifier OptionalTypeParameters OptionalInterfaceExtends InterfacePermits InterfaceBody
     ;
 
 // Annotation interface declaration
@@ -427,6 +427,12 @@ ConstructorBody
     : LBRACE OptionalExplicitConstructorInvocation BlockStatements RBRACE
     ;
 
+// Method body
+MethodBody
+    : Block
+    | SEMICOLON
+    ;
+
 // ============================================================================
 // Body Member declarations
 // ============================================================================
@@ -447,6 +453,21 @@ ClassBodyDeclaration
 EnumBodyDeclarations
     : /* empty */
     | SEMICOLON ClassBodyDeclarations
+    ;
+
+// Enum constants
+OptionalEnumConstantList
+    : /* empty */
+    | EnumConstantList
+    ;
+
+EnumConstantList
+    : EnumConstant
+    | EnumConstant COMMA EnumConstantList
+    ;
+
+EnumConstant
+    : EnumConstantModifiers Identifier OptionalParenthesizedArguments OptionalClassBody
     ;
 
 // Record body declarations
@@ -502,6 +523,10 @@ ClassMemberDeclaration
 // Constructor declaration
 ConstructorDeclaration
     : ConstructorModifiers ConstructorDeclarator OptionalThrows ConstructorBody
+    ;
+
+ConstructorDeclarator
+    : OptionalTypeParameters SimpleTypeName LPAREN OptionalReceiverParameterComma OptionalFormalParameterList RPAREN
     ;
 
 // Compact constructor declaration
@@ -577,6 +602,15 @@ MethodHeader
     | TypeParameters Annotations Result MethodDeclarator OptionalThrows
     ;
 
+Result
+    : UnannType
+    | VOID
+    ;
+
+MethodDeclarator
+    : Identifier LPAREN OptionalReceiverParameterComma OptionalFormalParameterList RPAREN OptionalDims
+    ;
+
 // ============================================================================
 // Initializers
 // ============================================================================
@@ -639,6 +673,28 @@ ClassPermits
     ;
 
 // ============================================================================
+// Throws
+// ============================================================================
+OptionalThrows
+    : /* empty */
+    | Throws
+    ;
+
+Throws
+    : THROWS ExceptionTypeList
+    ;
+
+ExceptionTypeList
+    : ExceptionType
+    | ExceptionType COMMA ExceptionTypeList
+    ;
+
+ExceptionType
+    : ClassType
+    | TypeVariable
+    ;
+
+// ============================================================================
 // Types
 // ============================================================================
 Type
@@ -657,6 +713,18 @@ ReferenceType
     : ClassOrInterfaceType
     | TypeVariable
     | ArrayType
+    ;
+
+// Local Variable Type
+LocalVariableType
+    : UnannType
+    | VAR
+    ;
+
+// Lambda parameter type
+LambdaParameterType
+    : UnannType
+    | VAR
     ;
 
 // ============================================================================
@@ -719,6 +787,50 @@ InterfaceType
     ;
 
 // ============================================================================
+// Unannotated Types
+// ============================================================================
+UnannType
+    : UnannPrimitiveType
+    | UnannReferenceType
+    ;
+
+UnannPrimitiveType
+    : NumericType
+    | BOOLEAN
+    ;
+
+UnannReferenceType
+    : UnannClassOrInterfaceType
+    | UnannTypeVariable
+    | UnannArrayType
+    ;
+
+UnannClassOrInterfaceType
+    : UnannClassType
+    | UnannInterfaceType
+    ;
+
+UnannInterfaceType
+    : UnannClassType
+    ;
+
+UnannClassType
+    : TypeIdentifier OptionalTypeArguments
+    | PackageName DOT Annotations TypeIdentifier OptionalTypeArguments
+    | UnannClassOrInterfaceType DOT Annotations TypeIdentifier OptionalTypeArguments
+    ;
+
+UnannTypeVariable
+    : TypeIdentifier
+    ;
+
+UnannArrayType
+    : UnannPrimitiveType Dims
+    | UnannClassOrInterfaceType Dims
+    | UnannTypeVariable Dims
+    ;
+
+// ============================================================================
 // Annotations
 // ============================================================================
 Annotations
@@ -760,6 +872,19 @@ ElementValuePairList
 // Element value pair
 ElementValuePair
     : Identifier ASSIGN ElementValue
+    ;
+
+// Element value array initializer
+ElementValueArrayInitializer
+    : LBRACE ElementValueList COMMA RBRACE
+    | LBRACE ElementValueList RBRACE
+    | LBRACE COMMA RBRACE
+    | LBRACE RBRACE
+    ;
+
+ElementValueList
+    : ElementValue
+    | ElementValue COMMA ElementValueList
     ;
 
 // Element value
@@ -819,6 +944,171 @@ AmbiguousName
     : Identifier
     | AmbiguousName DOT Identifier
     ;
+// Type Identifier
+TypeIdentifier // https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-TypeIdentifier
+    : Identifier
+    ;
+// Method Name
+MethodName:
+    : UnqualifiedMethodIdentifier
+    ;
+
+UnqualifiedMethodIdentifier
+    : Identifier
+    ;
+
+// ============================================================================
+// Arguments and Parameters
+// ============================================================================
+OptionalParenthesizedArguments
+    : /* empty */
+    | LPAREN OptionalArgumentList RPAREN
+    ;
+
+OptionalArgumentList
+    : /* empty */
+    | ArgumentList
+    ;
+
+ArgumentList
+    : Expression
+    : Expression COMMA ArgumentList
+    ;
+
+// Type Arguments
+OptionalTypeArgumentsOrDiamond
+    : /* empty */
+    | TypeArgumentsOrDiamond
+    ;
+
+TypeArgumentsOrDiamond
+    : LT GT
+    | TypeArguments
+    ;
+
+OptionalTypeArguments
+    : /* empty */
+    | TypeArguments
+    ;
+
+TypeArguments
+    : LT TypeArgumentList GT
+    ;
+
+TypeArgumentList
+    : TypeArgument
+    | TypeArgument COMMA TypeArgumentList
+    ;
+
+TypeArgument
+    : ReferenceType
+    | Wildcard
+    ;
+
+Wildcard
+    : Annotations QUESTION_MARK WildcardBounds
+    ;
+
+// Type parameters
+OptionalTypeParameters
+    : /* empty */
+    | TypeParameters
+    ;
+
+TypeParameters
+    : LT TypeParameterList GT
+    ;
+
+TypeParameterList
+    : TypeParameter
+    | TypeParameter COMMA TypeParameterList
+    ;
+
+TypeParameter
+    : TypeParameterModifiers TypeIdentifier OptionalTypeBound
+    ;
+
+// Receiver Parameter
+OptionalReceiverParameterComma
+    : /* empty */
+    | ReceiverParameter COMMA
+    ;
+
+ReceiverParameter
+    : Annotations UnannType Identifier DOT THIS
+    | Annotations UnannType THIS
+    ;
+
+// Formal parameters
+OptionalFormalParameterList
+    : /* empty */
+    | FormalParameterList
+    ;
+
+FormalParameterList
+    : FormalParameter
+    | FormalParameter COMMA FormalParameterList
+    ;
+
+FormalParameter
+    : VariableModifierList UnannType VariableDeclaratorId
+    | VariableArityParameter
+    ;
+
+VariableArityParameter
+    : VariableModifierList UnannType Annotations DOT DOT DOT Identifier
+    ;
+
+// ============================================================================
+// Bounds
+// ============================================================================
+// Type bound
+OptionalTypeBound
+    : /* empty */
+    | TypeBound
+    ;
+
+TypeBound
+    : EXTENDS TypeVariable
+    | EXTENDS ClassOrInterfaceType AdditionalBoundList
+    ;
+
+WildcardBounds
+    : /* empty */
+    | EXTENDS ReferenceType
+    | SUPER ReferenceType
+    ;
+
+// Additional bounds
+AdditionalBoundList
+    : /* empty */
+    | AdditionalBound AdditionalBoundList
+    ;
+
+AdditionalBound
+    : BITWISE_AND InterfaceType
+    ;
+
+// ============================================================================
+// Block
+// ============================================================================
+Block
+    : LBRACE BlockStatements RBRACE
+    ;
+
+// ============================================================================
+// Dims
+// ============================================================================
+OptionalDims
+    : /* empty */
+    | Dims
+    ;
+
+Dims
+    : Annotations LBRACKET RBRACKET
+    | Annotations LBRACKET RBRACKET Dims
+    ;
+
 // ============================================================================
 // Statements
 // ============================================================================
@@ -866,187 +1156,103 @@ Statement
 // ============================================================================
 // Expressions
 // ============================================================================
-
-// Enum constants
-OptionalEnumConstantList
-    : /* empty */
-    | EnumConstantList
+ParenthesizedExpression
+    : LPAREN Expression RPAREN
     ;
 
-EnumConstantList
-    : EnumConstant
-    | EnumConstant COMMA EnumConstantList
+Expression
+    : LambdaExpression
+    | AssignmentExpression
     ;
 
-EnumConstant
-    : EnumConstantModifiers Identifier OptionalParenthesizedArguments OptionalClassBody
+// Lambda expression
+LambdaExpression
+    : LambdaParameters ARROW LambdaBody
     ;
 
-OptionalParenthesizedArguments
-    : /* empty */
-    | LPAREN OptionalArgumentList RPAREN
+// Lambda expression - Lambda parameters
+LambdaParameters
+    : LPAREN LambdaParameterList RPAREN
+    | ConciseLambdaParameter
     ;
 
-// Constructor declarator
-ConstructorDeclarator
-    : TypeParameters SimpleTypeName LPAREN ReceiverParameter COMMA FormalParameterList RPAREN
-    | SimpleTypeName LPAREN ReceiverParameter COMMA FormalParameterList RPAREN
-    | TypeParameters SimpleTypeName LPAREN FormalParameterList RPAREN
-    | SimpleTypeName LPAREN FormalParameterList RPAREN
-    | TypeParameters SimpleTypeName LPAREN RPAREN
-    | SimpleTypeName LPAREN RPAREN
+LambdaParameterList
+    : NormalLambdaParameterList
+    | ConciseLambdaParameterList
     ;
 
-MethodBody
-    : Block
-    | SEMICOLON
+ConciseLambdaParameterList
+    : ConciseLambdaParameter
+    | ConciseLambdaParameter COMMA ConciseLambdaParameterList
     ;
 
-OptionalThrows
-    : /* empty */
-    | Throws
+ConciseLambdaParameter
+    : Identifier
+    | "_"
     ;
 
-Throws
-    : THROWS ExceptionTypeList
+NormalLambdaParameterList
+    : NormalLambdaParameter
+    | NormalLambdaParameter COMMA NormalLambdaParameterList
     ;
 
-ExceptionTypeList
-    : ExceptionType
-    | ExceptionType COMMA ExceptionTypeList
-    ;
-
-ExceptionType
-    : ClassType
-    | TypeVariable
-    ;
-
-Result
-    : UnannType
-    | VOID
-    ;
-
-MethodDeclarator
-    : Identifier LPAREN ReceiverParameter COMMA FormalParameterList RPAREN Dims
-    | Identifier LPAREN ReceiverParameter COMMA FormalParameterList RPAREN
-    | Identifier LPAREN ReceiverParameter COMMA RPAREN Dims
-    | Identifier LPAREN ReceiverParameter COMMA RPAREN
-    | Identifier LPAREN FormalParameterList RPAREN Dims
-    | Identifier LPAREN FormalParameterList RPAREN
-    | Identifier LPAREN RPAREN Dims
-    | Identifier LPAREN RPAREN
-    ;
-
-ReceiverParameter
-    : Annotations UnannType Identifier DOT THIS
-    | Annotations UnannType THIS
-    ;
-
-FormalParameterList
-    : FormalParameter
-    | FormalParameter COMMA FormalParameterList
-    ;
-
-FormalParameter
-    : VariableModifierList UnannType VariableDeclaratorId
+NormalLambdaParameter
+    : VariableModifierList LambdaParameterType VariableDeclaratorId
     | VariableArityParameter
     ;
 
-VariableArityParameter
-    : VariableModifierList UnannType Annotations DOT DOT DOT Identifier
+// Lambda expression - Lambda body
+LambdaBody
+    : Expression
+    | Block
     ;
 
-OptionalTypeArgumentsOrDiamond
-    : /* empty */
-    | TypeArgumentsOrDiamond
+// Assignment expression
+AssignmentExpression // https://docs.oracle.com/javase/specs/jls/se23/html/jls-15.html#jls-AssignmentExpression
+    : ConditionalExpression
+    | Assignment
     ;
 
-TypeArgumentsOrDiamond
-    : LT GT
-    | TypeArguments
+// Assignment expression - Assignment
+Assignment
+    : LeftHandSide AssignmentOperator Expression
     ;
 
-OptionalTypeArguments
-    : /* empty */
-    | TypeArguments
+LeftHandSide
+    : ExpressionName
+    | FieldAccess
+    | ArrayAccess
     ;
 
-TypeArguments
-    : LT TypeArgumentList GT
+FieldAccess
+    : Primary DOT Identifier
+    | SUPER DOT Identifier
+    | TypeName DOT SUPER DOT Identifier
     ;
 
-TypeArgumentList
-    : TypeArgument
-    | TypeArgument COMMA TypeArgumentList
+ArrayAccess
+    : ExpressionName LBRACKET Expression RBRACKET
+    | PrimaryNoNewArray LBRACKET Expression RBRACKET
+    | ArrayCreationExpressionWithInitializer LBRACKET Expression RBRACKET
     ;
 
-TypeArgument
-    : ReferenceType
-    | Wildcard
+// Assignment operators
+AssignmentOperator
+    : ASSIGN
+    | TIMES_ASSIGN
+    | DIVIDE_ASSIGN
+    | MOD_ASSIGN
+    | PLUS_ASSIGN
+    | MINUS_ASSIGN
+    | LEFT_SHIFT_ASSIGN
+    | RIGHT_SHIFT_ASSIGN
+    | UNSIGNED_RIGHT_SHIFT_ASSIGN
+    | BITWISE_AND_ASSIGN
+    | BITWISE_XOR_ASSIGN
+    | BITWISE_OR_ASSIGN
     ;
 
-Wildcard
-    : Annotations QUESTION_MARK WildcardBounds
-    ;
-
-WildcardBounds
-    : /* empty */
-    | EXTENDS ReferenceType
-    | SUPER ReferenceType
-    ;
-
-// Dims
-Dims
-    : Annotations LBRACKET RBRACKET
-    | Annotations LBRACKET RBRACKET Dims
-    ;
-
-// Type parameters
-TypeParameters
-    : /* empty */
-    | LT TypeParameterList GT
-    ;
-
-TypeParameterList
-    : TypeParameter
-    | TypeParameter COMMA TypeParameterList
-    ;
-
-TypeParameter
-    : TypeParameterModifiers TypeIdentifier TypeBound
-    ;
-
-TypeBound
-    : EXTENDS TypeVariable
-    | EXTENDS ClassOrInterfaceType AdditionalBoundList
-    ;
-
-AdditionalBoundList
-    : /* empty */
-    | AdditionalBound AdditionalBoundList
-    ;
-
-AdditionalBound
-    : BITWISE_AND InterfaceType
-    ;
-
-// Define the TypeIdentifier rule using this: https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-TypeIdentifier
-TypeIdentifier
-    : Identifier
-    ;
-
-ElementValueArrayInitializer
-    : LBRACE ElementValueList COMMA RBRACE
-    | LBRACE ElementValueList RBRACE
-    | LBRACE COMMA RBRACE
-    | LBRACE RBRACE
-    ;
-
-ElementValueList
-    : ElementValue
-    | ElementValue COMMA ElementValueList
-    ;
-
+// Conditional Expression
 ConditionalExpression
     : ConditionalOrExpression
     | ConditionalOrExpression QUESTION_MARK Expression COLON ConditionalExpression
@@ -1300,14 +1506,6 @@ MethodInvocation
     | TypeName DOT SUPER DOT OptionalTypeArguments Identifier LPAREN OptionalArgumentList RPAREN
     ;
 
-MethodName:
-    : UnqualifiedMethodIdentifier
-    ;
-
-UnqualifiedMethodIdentifier
-    : Identifier
-    ;
-
 // Class instance creation expression
 ClassInstanceCreationExpression
     : UnqualifiedClassInstanceCreationExpression
@@ -1330,55 +1528,6 @@ AnnotatedIdentifierDotList
 
 AnnotatedIdentifier
     : Annotations Identifier
-    ;
-
-OptionalArgumentList
-    : /* empty */
-    | ArgumentList
-    ;
-
-ArgumentList
-    : Expression
-    : Expression COMMA ArgumentList
-    ;
-
-// Expressions
-ParenthesizedExpression
-    : LPAREN Expression RPAREN
-    ;
-
-Expression
-    : LambdaExpression
-    | AssignmentExpression
-    ;
-
-// Assignment expression
-// https://docs.oracle.com/javase/specs/jls/se23/html/jls-15.html#jls-AssignmentExpression
-AssignmentExpression
-    : ConditionalExpression
-    | Assignment
-    ;
-
-Assignment
-    : LeftHandSide AssignmentOperator Expression
-    ;
-
-LeftHandSide
-    : ExpressionName
-    | FieldAccess
-    | ArrayAccess
-    ;
-
-FieldAccess
-    : Primary DOT Identifier
-    | SUPER DOT Identifier
-    | TypeName DOT SUPER DOT Identifier
-    ;
-
-ArrayAccess
-    : ExpressionName LBRACKET Expression RBRACKET
-    | PrimaryNoNewArray LBRACKET Expression RBRACKET
-    | ArrayCreationExpressionWithInitializer LBRACKET Expression RBRACKET
     ;
 
 // Array creation
@@ -1406,131 +1555,14 @@ DimExpr
     : Annotations LBRACKET Expression RBRACKET
     ;
 
-// Assignment operators
-AssignmentOperator
-    : ASSIGN
-    | TIMES_ASSIGN
-    | DIVIDE_ASSIGN
-    | MOD_ASSIGN
-    | PLUS_ASSIGN
-    | MINUS_ASSIGN
-    | LEFT_SHIFT_ASSIGN
-    | RIGHT_SHIFT_ASSIGN
-    | UNSIGNED_RIGHT_SHIFT_ASSIGN
-    | BITWISE_AND_ASSIGN
-    | BITWISE_XOR_ASSIGN
-    | BITWISE_OR_ASSIGN
-    ;
-
-// Lambda expression
-LambdaExpression
-    : LambdaParameters ARROW LambdaBody
-    ;
-
-// Lambda Parameters
-LambdaParameters
-    : LPAREN LambdaParameterList RPAREN
-    | ConciseLambdaParameter
-    ;
-
-LambdaParameterList
-    : NormalLambdaParameterList
-    | ConciseLambdaParameterList
-    ;
-
-ConciseLambdaParameterList
-    : ConciseLambdaParameter
-    | ConciseLambdaParameter COMMA ConciseLambdaParameterList
-    ;
-
-ConciseLambdaParameter
-    : Identifier
-    | "_"
-    ;
-
-NormalLambdaParameterList
-    : NormalLambdaParameter
-    | NormalLambdaParameter COMMA NormalLambdaParameterList
-    ;
-
-NormalLambdaParameter
-    : VariableModifierList LambdaParameterType VariableDeclaratorId
-    | VariableArityParameter
-    ;
-
 VariableDeclaratorId
     : Identifier OptionalDims
     | "_"
     ;
 
-OptionalDims
-    : /* empty */
-    | Dims
-    ;
-
-LambdaParameterType
-    : UnannType
-    | VAR
-    ;
-
-UnannType
-    : UnannPrimitiveType
-    | UnannReferenceType
-    ;
-
-UnannPrimitiveType
-    : NumericType
-    | BOOLEAN
-    ;
-
-UnannReferenceType
-    : UnannClassOrInterfaceType
-    | UnannTypeVariable
-    | UnannArrayType
-    ;
-
-UnannClassOrInterfaceType
-    : UnannClassType
-    | UnannInterfaceType
-    ;
-
-UnannInterfaceType
-    : UnannClassType
-    ;
-
-UnannClassType
-    : TypeIdentifier OptionalTypeArguments
-    | PackageName DOT Annotations TypeIdentifier OptionalTypeArguments
-    | UnannClassOrInterfaceType DOT Annotations TypeIdentifier OptionalTypeArguments
-    ;
-
-UnannTypeVariable
-    : TypeIdentifier
-    ;
-
-UnannArrayType
-    : UnannPrimitiveType Dims
-    | UnannClassOrInterfaceType Dims
-    | UnannTypeVariable Dims
-    ;
-
-// Lambda body
-LambdaBody
-    : Expression
-    | Block
-    ;
-// Block
-Block
-    : LBRACE BlockStatements RBRACE
-    ;
 
 LocalVariableDeclaration
     : VariableModifierList LocalVariableType VariableDeclaratorList
-    ;
-
-LocalVariableType
-    : UnannType
-    | VAR
     ;
 
 VariableDeclaratorList
@@ -1563,6 +1595,9 @@ VariableInitializerList
     | VariableInitializer COMMA VariableInitializerList
     ;
 
+// ============================================================================
+// Literals
+// ============================================================================
 // Class literal
 ClassLiteral
     : TypeName OptionalEmptyBrackets DOT CLASS
