@@ -50,6 +50,8 @@ hexSignificand              ({hexNumeral}{dot}?) | 0[xX]{hexDigits}?{dot}{hexDig
 // character and string support
 singleQuote                 \'
 doubleQuote                 \"
+textBlockDelimiter          {doubleQuote}{doubleQuote}{doubleQuote}
+textBlockWhitespace         (?!{lineTerminator}){whitespace}
 
 lineTerminator              (\r\n) | [\r\n]
 
@@ -64,6 +66,7 @@ octalEscape                 \\(({octalDigit})|({octalDigit}{octalDigit})|({zeroT
 escapeSequence              (\\([bstnfr"'\\]|{lineTerminator}))|{octalEscape}
 
 stringCharacter             (?!["\\]){inputCharacter} | {escapeSequence}
+textBlockCharacter          (?![\\]){inputCharacter} | {escapeSequence} | {lineTerminator}
 
 %%
 
@@ -91,6 +94,7 @@ stringCharacter             (?!["\\]){inputCharacter} | {escapeSequence}
 {singleQuote}{singleCharacter}{singleQuote}     return 'SINGLE_CHARACTER_LITERAL';
 {singleQuote}{escapeSequence}{singleQuote}      return 'ESCAPE_SEQUENCE_CHARACTER_LITERAL';
 {doubleQuote}{stringCharacter}*{doubleQuote}    return 'STRING_LITERAL';
+{textBlockDelimiter}{textBlockWhitespace}*{lineTerminator}{textBlockCharacter}*{textBlockDelimiter} return 'TEXT_BLOCK_LITERAL';
 // boolean literals
 "true"                                          return 'TRUE';
 "false"                                         return 'FALSE';

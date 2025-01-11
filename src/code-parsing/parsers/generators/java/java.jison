@@ -1867,8 +1867,8 @@ Literal
     | BooleanLiteral
     | CharacterLiteral
     | STRING_LITERAL
-    | TextBlock
-    | NullLiteral
+    | TEXT_BLOCK_LITERAL
+    | NULL
     ;
 
 // Integer literals
@@ -1891,32 +1891,9 @@ BooleanLiteral
     | FALSE
     ;
 // Character literals
-// TODO: Figure out how to clean these up
 CharacterLiteral
     : SINGLE_CHARACTER_LITERAL
     | ESCAPE_SEQUENCE_CHARACTER_LITERAL
-    ;
-
-// String literals
-// Text block
-// TODO: https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-TextBlock
-TextBlock
-    : " " " {TextBlockWhiteSpace} LineTerminator {TextBlockCharacter} " " "
-    ;
-
-TextBlockWhiteSpace
-    : WhiteSpace but not LineTerminator
-    ;
-
-TextBlockCharacter
-    : InputCharacter but not \
-    | EscapeSequence
-    | LineTerminator
-    ;
-
-// Null literal
-NullLiteral
-    : NULL
     ;
 
 // Keywords
@@ -1996,35 +1973,4 @@ ContextualKeyword
     | WHEN
     | WITH
     | YIELD
-    ;
-
-// Characters
-UnicodeInputCharacter
-    : UnicodeEscape
-    | RawInputCharacter
-    ;
-
-UnicodeEscape
-    : BACKSLASH UNICODE_MARKER HexDigit HexDigit HexDigit HexDigit
-    ;
-
-HexDigit
-    : [0-9a-fA-F]
-    ;
-
-OctalDigit
-    : [0-7]
-    ;
-
-ZeroToThree
-    : [0-3]
-    ;
-
-LineTerminator
-    : "\n"
-    // TODO make sure this actually supports all line terminators
-    ;
-
-RawInputCharacter
-    : .
     ;
