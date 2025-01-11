@@ -1,11 +1,14 @@
 // shortcut declarations
+underscores                 _+
+id                          [a-zA-Z_][a-zA-Z0-9_]*
+whitespace                  \s+
+
 // decimal numerals
 nonzeroDigit                [1-9]
 digit                       0|{nonzeroDigit}
 digitOrUnderscore           [0-9_]
 digitsAndUnderscores        {digitOrUnderscore}+
 digits                      {digit} | ({digit}{digitsAndUnderscores}{digit})
-underscores                 _+
 decimalNumeral              0 | ({nonzeroDigit}{digits}*) | ({nonzeroDigit}{underscores}{digits})
 // hex numerals
 hexDigit                    [0-9a-fA-F]
@@ -29,9 +32,18 @@ binaryNumeral               0[bB]{binaryDigits}
 // suffixes
 integerTypeSuffix           [lL]
 floatTypeSuffix             [fFdD]
+exponentIndicator           [eE]
+binaryExponentIndicator     [pP]
+sign                        [+-]
+dot                         \.
 
-id                          [a-zA-Z_][a-zA-Z0-9_]*
-whitespace                  \s+
+signedInteger               {sign}?{digits}
+
+// exponent parts
+exponentPart                {exponentIndicator}{signedInteger}
+binaryExponent              {binaryExponentIndicator}{signedInteger}
+
+hexSignificand              ({hexNumeral}{dot}?) | 0[xX]{hexDigits}?{dot}{hexDigits}
 
 %%
 
@@ -50,12 +62,18 @@ whitespace                  \s+
 {octalNumeral}{integerTypeSuffix}?              return 'OCTAL_INTEGER_LITERAL';
 {binaryNumeral}{integerTypeSuffix}?             return 'BINARY_INTEGER_LITERAL';
 // floating point literals
-{digit}+(\.{digit}+)?([eE][+-]?{digit}+)?[fF]   return 'FLOAT_LITERAL';
-{digit}+(\.{digit}+)?([eE][+-]?{digit}+)?[dD]?  return 'DOUBLE_LITERAL';
+{digits}{dot}{digits}?{exponentPart}?{floatTypeSuffix}?   return 'DECIMAL_FLOATING_POINT_LITERAL';
+{dot}{digits}{exponentPart}?{floatTypeSuffix}?            return 'DECIMAL_FLOATING_POINT_LITERAL';
+{digits}{exponentPart}{floatTypeSuffix}?                  return 'DECIMAL_FLOATING_POINT_LITERAL';
+{digits}{exponentPart}?{floatTypeSuffix}                  return 'DECIMAL_FLOATING_POINT_LITERAL';
+{hexSignificand}{binaryExponent}{floatTypeSuffix}?        return 'HEX_FLOATING_POINT_LITERAL';
+// string and character literals
 \"([^\"\\]|\\.)*\"                              return 'STRING_LITERAL';
-"null"                                          return 'NULL';
+// boolean literals
 "true"                                          return 'TRUE';
 "false"                                         return 'FALSE';
+// null literal
+"null"                                          return 'NULL';
 
 // reserved keywords
 "abstract"                                      return 'ABSTRACT';
@@ -170,7 +188,7 @@ whitespace                  \s+
 ">="                                            return 'GREATER_EQUAL';
 ";"                                             return 'SEMICOLON';
 ","                                             return 'COMMA';
-"."                                             return 'DOT';
+{dot}                                           return 'DOT';
 "&"                                             return 'BITWISE_AND';
 "|"                                             return 'BITWISE_OR';
 "^"                                             return 'BITWISE_XOR';

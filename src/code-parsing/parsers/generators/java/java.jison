@@ -1881,58 +1881,9 @@ IntegerLiteral
 
 // Floating point literals
 FloatingPointLiteral
-    : DecimalFloatingPointLiteral
-    | HexadecimalFloatingPointLiteral
+    : DECIMAL_FLOATING_POINT_LITERAL
+    | HEX_FLOATING_POINT_LITERAL
     ;
-
-/*
-https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-FloatingPointLiteral
-
-    DecimalFloatingPointLiteral:
-        Digits . [Digits] [ExponentPart] [FloatTypeSuffix]
-        . Digits [ExponentPart] [FloatTypeSuffix]
-        Digits ExponentPart [FloatTypeSuffix]
-        Digits [ExponentPart] FloatTypeSuffix
-  
-    ExponentPart:
-        ExponentIndicator SignedInteger
-
-    ExponentIndicator:
-        (one of)
-        e E
-
-    SignedInteger:
-        OptionalSign Digits
-
-    OptionalSign
-        :
-        | Sign
-        ;
-
-    Sign
-        : PLUS
-        | MINUS
-        ;
-
-    FloatTypeSuffix:
-        (one of)
-        f F d D
-
-    HexadecimalFloatingPointLiteral:
-        HexSignificand BinaryExponent [FloatTypeSuffix]
-
-    HexSignificand:
-        HexNumeral [.]
-        0 x [HexDigits] . HexDigits
-        0 X [HexDigits] . HexDigits
-
-    BinaryExponent:
-        BinaryExponentIndicator SignedInteger
-
-    BinaryExponentIndicator:
-        (one of)
-        p P
-*/
 
 // Boolean literals
 BooleanLiteral
