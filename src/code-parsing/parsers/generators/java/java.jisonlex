@@ -1,13 +1,21 @@
 // shortcut declarations
-underscores                 _+
-id                          [a-zA-Z_][a-zA-Z0-9_]*
 whitespace                  \s+
+nonzeroDigit                [1-9]
+digit                       0 | {nonzeroDigit}
+currencySymbol              \p{Sc}
+connectorPunctuation        \p{Pc}
+numericLetter               \p{Nl}
+combiningMark               \p{Mc}
+nonspacingMark              \p{Mn}
+letter                      \p{L}
+javaIdentifierStart         {letter} | {currencySymbol} | {connectorPunctuation} 
+javaIdentifierPart          {letter} | {currencySymbol} | {connectorPunctuation} | {digit} | {numericLetter} | {combiningMark} | {nonspacingMark}
+id                          {javaIdentifierStart}{javaIdentifierPart}*
+underscores                 _+
 
 zeroToThree                 [0-3]
 
 // decimal numerals
-nonzeroDigit                [1-9]
-digit                       0|{nonzeroDigit}
 digitOrUnderscore           [0-9_]
 digitsAndUnderscores        {digitOrUnderscore}+
 digits                      {digit} | ({digit}{digitsAndUnderscores}{digit})
