@@ -1873,41 +1873,12 @@ Literal
 
 // Integer literals
 IntegerLiteral
-    : DecimalIntegerLiteral
-    | HexIntegerLiteral
-    | OctalIntegerLiteral
-    | BinaryIntegerLiteral
+    : DECIMAL_INTEGER_LITERAL
+    | HEX_INTEGER_LITERAL
+    | OCTAL_INTEGER_LITERAL
+    | BINARY_INTEGER_LITERAL
     ;
 
-// TODO: Figure out how to clean these up
-// Do they need to be in jisonlex?
-// https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-IntegerLiteral
-DecimalIntegerLiteral
-    : DecimalNumeral OptionalIntegerTypeSuffix
-    ;
-
-HexIntegerLiteral
-    : HexNumeral OptionalIntegerTypeSuffix
-    ;
-
-OctalIntegerLiteral
-    : OctalNumeral OptionalIntegerTypeSuffix
-    ;
-
-BinaryIntegerLiteral
-    : BinaryNumeral OptionalIntegerTypeSuffix
-    ;
-
-OptionalIntegerTypeSuffix
-    : /* empty */
-    | IntegerTypeSuffix
-    ;
-
-IntegerTypeSuffix
-    : "L"
-    | "l"
-    ;
-// End TODO
 // Floating point literals
 FloatingPointLiteral
     : DecimalFloatingPointLiteral

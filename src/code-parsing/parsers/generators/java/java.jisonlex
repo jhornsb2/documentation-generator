@@ -1,5 +1,35 @@
 // shortcut declarations
-digit                       [0-9]
+// decimal numerals
+nonzeroDigit                [1-9]
+digit                       0|{nonzeroDigit}
+digitOrUnderscore           [0-9_]
+digitsAndUnderscores        {digitOrUnderscore}+
+digits                      {digit} | ({digit}{digitsAndUnderscores}{digit})
+underscores                 _+
+decimalNumeral              0 | ({nonzeroDigit}{digits}*) | ({nonzeroDigit}{underscores}{digits})
+// hex numerals
+hexDigit                    [0-9a-fA-F]
+hexDigitOrUnderscore        {hexDigit} | _
+hexDigitOrUnderscores       {hexDigitOrUnderscore}+
+hexDigits                   {hexDigit} | ({hexDigit}{hexDigitOrUnderscores}{hexDigit})
+hexNumeral                  0[xX]{hexDigits}
+// octal numerals
+octalDigit                  [0-7]
+octalDigitOrUnderscore      {octalDigit} | _
+octalDigitsAndUnderscores   {octalDigitOrUnderscore}+
+octalDigits                 {octalDigit} | ({octalDigit}{octalDigitsAndUnderscores}{octalDigit})
+octalNumeral                (0{octalDigits}) | (0{underscores}{octalDigits})
+// binary numerals
+binaryDigit                 [01]
+binaryDigitOrUnderscore     {binaryDigit} | _
+binaryDigitsAndUnderscores  {binaryDigitOrUnderscore}+
+binaryDigits                {binaryDigit} | ({binaryDigit}{binaryDigitsAndUnderscores}{binaryDigit})
+binaryNumeral               0[bB]{binaryDigits}
+
+// suffixes
+integerTypeSuffix           [lL]
+floatTypeSuffix             [fFdD]
+
 id                          [a-zA-Z_][a-zA-Z0-9_]*
 whitespace                  \s+
 
@@ -14,7 +44,12 @@ whitespace                  \s+
 \/\*\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/    return 'DOC_COMMENT';
 
 // literals
-{digit}+                                        return 'INTEGER_LITERAL';
+// integer literals
+{decimalNumeral}{integerTypeSuffix}?            return 'DECIMAL_INTEGER_LITERAL';
+{hexNumeral}{integerTypeSuffix}?                return 'HEX_INTEGER_LITERAL';
+{octalNumeral}{integerTypeSuffix}?              return 'OCTAL_INTEGER_LITERAL';
+{binaryNumeral}{integerTypeSuffix}?             return 'BINARY_INTEGER_LITERAL';
+// floating point literals
 {digit}+(\.{digit}+)?([eE][+-]?{digit}+)?[fF]   return 'FLOAT_LITERAL';
 {digit}+(\.{digit}+)?([eE][+-]?{digit}+)?[dD]?  return 'DOUBLE_LITERAL';
 \"([^\"\\]|\\.)*\"                              return 'STRING_LITERAL';
