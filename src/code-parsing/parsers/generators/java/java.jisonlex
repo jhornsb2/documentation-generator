@@ -3,6 +3,8 @@ underscores                 _+
 id                          [a-zA-Z_][a-zA-Z0-9_]*
 whitespace                  \s+
 
+zeroToThree                 [0-3]
+
 // decimal numerals
 nonzeroDigit                [1-9]
 digit                       0|{nonzeroDigit}
@@ -45,6 +47,22 @@ binaryExponent              {binaryExponentIndicator}{signedInteger}
 
 hexSignificand              ({hexNumeral}{dot}?) | 0[xX]{hexDigits}?{dot}{hexDigits}
 
+// character and string support
+singleQuote                 \'
+doubleQuote                 \"
+
+lineTerminator              (\r\n) | [\r\n]
+
+rawInputCharacter           .
+unicodeMarker               u+
+unicodeEscape               \\{unicodeMarker}{hexDigit}{hexDigit}{hexDigit}{hexDigit}
+unicodeInputCharacter       {unicodeEscape} | {rawInputCharacter}
+inputCharacter              (?![\r\n]){unicodeInputCharacter}
+singleCharacter             (?!['\\]){inputCharacter}
+
+octalEscape                 \\(({octalDigit})|({octalDigit}{octalDigit})|({zeroToThree}{octalDigit}{octalDigit}))
+escapeSequence              (\\([bstnfr"'\\]|{lineTerminator}))|{octalEscape}
+
 %%
 
 // ignore whitespace and comments
@@ -68,6 +86,8 @@ hexSignificand              ({hexNumeral}{dot}?) | 0[xX]{hexDigits}?{dot}{hexDig
 {digits}{exponentPart}?{floatTypeSuffix}                  return 'DECIMAL_FLOATING_POINT_LITERAL';
 {hexSignificand}{binaryExponent}{floatTypeSuffix}?        return 'HEX_FLOATING_POINT_LITERAL';
 // string and character literals
+{singleQuote}{singleCharacter}{singleQuote}     return 'SINGLE_CHARACTER_LITERAL';
+{singleQuote}{escapeSequence}{singleQuote}      return 'ESCAPE_SEQUENCE_CHARACTER_LITERAL';
 \"([^\"\\]|\\.)*\"                              return 'STRING_LITERAL';
 // boolean literals
 "true"                                          return 'TRUE';

@@ -1892,31 +1892,11 @@ BooleanLiteral
     ;
 // Character literals
 // TODO: Figure out how to clean these up
-// https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-CharacterLiteral
 CharacterLiteral
-    : RAW_CHARACTER_LITERAL
-    | EscapeSequence
+    : SINGLE_CHARACTER_LITERAL
+    | ESCAPE_SEQUENCE_CHARACTER_LITERAL
     ;
 
-EscapeSequence
-    : BACKSLASH "b"
-    | BACKSLASH "s"
-    | BACKSLASH "t"
-    | BACKSLASH "n"
-    | BACKSLASH "f"
-    | BACKSLASH "r"
-    | BACKSLASH LineTerminator
-    | BACKSLASH "\""
-    | BACKSLASH "'"
-    | BACKSLASH BACKSLASH
-    | OctalEscape
-    ;
-
-OctalEscape
-    : BACKSLASH OctalDigit
-    | BACKSLASH OctalDigit OctalDigit
-    | BACKSLASH ZeroToThree OctalDigit OctalDigit
-    ;
 // String literals
 // Text block
 // TODO: https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-TextBlock
