@@ -1866,7 +1866,7 @@ Literal
     | FloatingPointLiteral
     | BooleanLiteral
     | CharacterLiteral
-    | STRING_LITERAL // https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-StringLiteral
+    | STRING_LITERAL
     | TextBlock
     | NullLiteral
     ;

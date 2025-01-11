@@ -63,6 +63,8 @@ singleCharacter             (?!['\\]){inputCharacter}
 octalEscape                 \\(({octalDigit})|({octalDigit}{octalDigit})|({zeroToThree}{octalDigit}{octalDigit}))
 escapeSequence              (\\([bstnfr"'\\]|{lineTerminator}))|{octalEscape}
 
+stringCharacter             (?!["\\]){inputCharacter} | {escapeSequence}
+
 %%
 
 // ignore whitespace and comments
@@ -88,7 +90,7 @@ escapeSequence              (\\([bstnfr"'\\]|{lineTerminator}))|{octalEscape}
 // string and character literals
 {singleQuote}{singleCharacter}{singleQuote}     return 'SINGLE_CHARACTER_LITERAL';
 {singleQuote}{escapeSequence}{singleQuote}      return 'ESCAPE_SEQUENCE_CHARACTER_LITERAL';
-\"([^\"\\]|\\.)*\"                              return 'STRING_LITERAL';
+{doubleQuote}{stringCharacter}*{doubleQuote}    return 'STRING_LITERAL';
 // boolean literals
 "true"                                          return 'TRUE';
 "false"                                         return 'FALSE';
