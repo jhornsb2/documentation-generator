@@ -339,7 +339,7 @@ FieldModifier
     ;
 
 // Record component modifiers
-RecordComponentModifiers:
+RecordComponentModifiers
     : /* empty */
     | RecordComponentModifier RecordComponentModifiers
     ;
@@ -961,20 +961,20 @@ AmbiguousName
     ;
 // Type Identifier
 TypeIdentifier // https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-TypeIdentifier
-    : (?!\b(?:PERMITS|RECORD|SEALED|VAR|YIELD)\b)Identifier
+    : (?!\b(?=PERMITS|RECORD|SEALED|VAR|YIELD)\b)Identifier
     ;
 // Method Name
-MethodName:
+MethodName
     : UnqualifiedMethodIdentifier
     ;
 
 UnqualifiedMethodIdentifier
-    : (?!\b(?:YIELD)\b)Identifier
+    : (?!\b(?=YIELD)\b)Identifier
     ;
 
 // Identifier
 Identifier
-    : (?!\b(?:ABSTRACT|ASSERT|BOOLEAN|BREAK|BYTE|CASE|CATCH|CHAR|CLASS|CONST|CONTINUE|DEFAULT|DO|DOUBLE|ELSE|ENUM|EXTENDS|FINAL|FINALLY|FLOAT|FOR|IF|GOTO|IMPLEMENTS|IMPORT|INSTANCEOF|INT|INTERFACE|LONG|NATIVE|NEW|PACKAGE|PRIVATE|PROTECTED|PUBLIC|RETURN|SHORT|STATIC|STRICTFP|SUPER|SWITCH|SYNCHRONIZED|THIS|THROW|THROWS|TRANSIENT|TRY|VOID|VOLATILE|WHILE|TRUE|FALSE|NULL)\b)IDENTIFIER
+    : (?!\b(?=ABSTRACT|ASSERT|BOOLEAN|BREAK|BYTE|CASE|CATCH|CHAR|CLASS|CONST|CONTINUE|DEFAULT|DO|DOUBLE|ELSE|ENUM|EXTENDS|FINAL|FINALLY|FLOAT|FOR|IF|GOTO|IMPLEMENTS|IMPORT|INSTANCEOF|INT|INTERFACE|LONG|NATIVE|NEW|PACKAGE|PRIVATE|PROTECTED|PUBLIC|RETURN|SHORT|STATIC|STRICTFP|SUPER|SWITCH|SYNCHRONIZED|THIS|THROW|THROWS|TRANSIENT|TRY|VOID|VOLATILE|WHILE|TRUE|FALSE|NULL)\b)IDENTIFIER
     ;
 
 // ============================================================================
@@ -992,7 +992,7 @@ OptionalArgumentList
 
 ArgumentList
     : Expression
-    : Expression COMMA ArgumentList
+    | Expression COMMA ArgumentList
     ;
 
 // Type Arguments
@@ -1659,11 +1659,11 @@ CasePatterns
     | CasePattern COMMA CasePatterns
     ;
 
-CasePattern:
+CasePattern
     : Pattern
     ;
 
-Pattern:
+Pattern
     : TypePattern
     | RecordPattern
     ;
@@ -1820,7 +1820,7 @@ LocalVariableDeclaration
     ;
 
 VariableDeclaratorList
-    | VariableDeclarator
+    : VariableDeclarator
     | VariableDeclarator COMMA VariableDeclaratorList
     ;
 

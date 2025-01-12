@@ -11,7 +11,7 @@ letter                      \p{L}
 javaIdentifierStart         {letter} | {currencySymbol} | {connectorPunctuation} 
 javaIdentifierPart          {letter} | {currencySymbol} | {connectorPunctuation} | {digit} | {numericLetter} | {combiningMark} | {nonspacingMark}
 id                          {javaIdentifierStart}{javaIdentifierPart}*
-underscores                 _+
+underscores                 [_]+
 
 zeroToThree                 [0-3]
 
@@ -64,7 +64,7 @@ textBlockWhitespace         (?!{lineTerminator}){whitespace}
 lineTerminator              (\r\n) | [\r\n]
 
 rawInputCharacter           .
-unicodeMarker               u+
+unicodeMarker               [u]+
 unicodeEscape               \\{unicodeMarker}{hexDigit}{hexDigit}{hexDigit}{hexDigit}
 unicodeInputCharacter       {unicodeEscape} | {rawInputCharacter}
 inputCharacter              (?![\r\n]){unicodeInputCharacter}
