@@ -74,7 +74,7 @@
   },
   "devDependencies": {
     "@jest/globals": "^30.0.4",
-    "@stylistic/eslint-plugin": "^2.12.1",
+    "@stylistic/eslint-plugin": "^5.1.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.13.11",
     "@typescript-eslint/eslint-plugin": "^8.36.0",
